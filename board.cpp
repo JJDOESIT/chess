@@ -133,4 +133,20 @@ void Board::swapPieces(int x1, int y1, int x2, int y2)
     Piece *tempPiecePtr = board[x1][y1];
     board[x1][y1] = board[x2][y2];
     board[x2][y2] = tempPiecePtr;
+
+    int *positionOne = board[x1][y1]->getPiecePosition();
+    int *positionTwo = board[x2][y2]->getPiecePosition();
+
+    int tempX = positionOne[0];
+    int tempY = positionOne[1];
+
+    board[x1][y1]->setPiecePosition(positionTwo[0], positionTwo[1]);
+    board[x2][y2]->setPiecePosition(tempX, tempY);
+}
+
+void Board::takePiece(int overwriteX, int overwriteY, int overwrittenX, int overwrittenY)
+{
+    board[overwrittenX][overwrittenY]->setPieceType(pieceType(NONE));
+    board[overwrittenX][overwrittenY]->setPieceColor(pieceColor(NEITHER));
+    swapPieces(overwriteX, overwriteY, overwrittenX, overwrittenY);
 }

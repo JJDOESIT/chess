@@ -22,14 +22,30 @@ int *Piece::getPieceType()
     return &pieceInfo.type;
 }
 
+void Piece::setPieceType(int type)
+{
+    pieceInfo.type = type;
+}
+
 int *Piece::getPieceColor()
 {
     return &pieceInfo.color;
 }
 
+void Piece::setPieceColor(int color)
+{
+    pieceInfo.color = color;
+}
+
 int *Piece::getPiecePosition()
 {
     return pieceInfo.position;
+}
+
+void Piece::setPiecePosition(int x, int y)
+{
+    pieceInfo.position[0] = x;
+    pieceInfo.position[1] = y;
 }
 
 std::vector<std::vector<int>> *Piece::getValidMoves()

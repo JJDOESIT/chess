@@ -23,8 +23,11 @@ private:
 public:
     Piece(int type, int color, int x, int y, std::string fileName = "");
     int *getPieceType();
+    void setPieceType(int type);
     int *getPieceColor();
+    void setPieceColor(int color);
     int *getPiecePosition();
+    void setPiecePosition(int x, int y);
     std::vector<std::vector<int>> *getValidMoves();
     void setSprite(std::string fileName);
     sf::Sprite *getSprite();

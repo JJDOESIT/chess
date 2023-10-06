@@ -23,6 +23,7 @@ public:
     void fillBoard();
     void overwritePiece(int type, int color, int x, int y);
     void swapPieces(int x1, int y1, int x2, int y2);
+    void takePiece(int overwriteX, int overwriteY, int overwrittenX, int overwrittenY);
 };
 
 #endif

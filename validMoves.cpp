@@ -32,8 +32,7 @@ void ValidMoves::getPawn(Piece *board[8][8], int x, int y)
     {
         if (checkBoundary(x + 1, y))
         {
-            int type = *board[x + 1][y]->getPieceType();
-            if (type == pieceType(NONE))
+            if (*board[x + 1][y]->getPieceType() == pieceType(NONE))
             {
                 validMovePtr->push_back(std::vector<int>{x + 1, y});
             }
@@ -186,5 +185,4 @@ void ValidMoves::getRook(Piece *board[8][8], int x, int y)
             }
         }
     }
-    printValidMoves(board, originalX, originalY);
 }

@@ -19,4 +19,11 @@ enum pieceColor
     NEITHER
 };
 
+enum playerTurn
+{
+    VIEW,
+    TAKE,
+    NADA
+};
+
 #endif

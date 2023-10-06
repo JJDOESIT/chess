@@ -7,6 +7,7 @@ rm board.o
 rm piece.o
 rm sfml-app
 rm validMoves.o
+rm input.o
 endef
 
 all:
