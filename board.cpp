@@ -148,5 +148,6 @@ void Board::takePiece(int overwriteX, int overwriteY, int overwrittenX, int over
 {
     board[overwrittenX][overwrittenY]->setPieceType(pieceType(NONE));
     board[overwrittenX][overwrittenY]->setPieceColor(pieceColor(NEITHER));
+    board[overwrittenX][overwrittenY]->getValidMoves()->clear();
     swapPieces(overwriteX, overwriteY, overwrittenX, overwrittenY);
 }

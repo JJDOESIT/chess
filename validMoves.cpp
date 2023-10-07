@@ -28,7 +28,7 @@ void ValidMoves::getPawn(Piece *board[8][8], int x, int y)
     validMovePtr->clear();
 
     // Get possible moves for white pawns
-    if (*board[x][y]->getPieceColor() == pieceColor(WHITE))
+    if (*board[x][y]->getPieceColor() == color::WHITE)
     {
         if (checkBoundary(x + 1, y))
         {
@@ -182,6 +182,28 @@ void ValidMoves::getRook(Piece *board[8][8], int x, int y)
             else if (color != *board[originalX][originalY]->getPieceColor())
             {
                 board[originalX][originalY]->addMove(x, y);
+            }
+        }
+    }
+}
+
+// Get possible moves for king
+void ValidMoves::getKing(Piece *board[8][8], int x, int y)
+{
+    // Clear valid moves vector
+    std::vector<std::vector<int>> *validMovesPtr = board[x][y]->getValidMoves();
+    validMovesPtr->clear();
+
+    // Possible moves for a king to move
+    std::vector<std::vector<int>> possibleMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
+
+    for (auto move : possibleMoves)
+    {
+        if (checkBoundary(x + move[0], y + move[1]))
+        {
+            if (*board[x + move[0]][y + move[1]]->getPieceColor() != *board[x][y]->getPieceColor())
+            {
+                board[x][y]->addMove(x + move[0], y + move[1]);
             }
         }
     }

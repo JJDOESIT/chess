@@ -1,29 +1,38 @@
 #ifndef PIECEENUM
 #define PIECEENUM
 
-enum pieceType
+namespace pieceType
 {
-    PAWN,
-    ROOK,
-    BISHOP,
-    KNIGHT,
-    QUEEN,
-    KING,
-    NONE
-};
+    enum pieceType
+    {
+        PAWN,
+        ROOK,
+        BISHOP,
+        KNIGHT,
+        QUEEN,
+        KING,
+        NONE
+    };
+}
 
-enum pieceColor
+namespace pieceColor
 {
-    WHITE,
-    BLACK,
-    NEITHER
-};
+    enum pieceColor
+    {
+        WHITE,
+        BLACK,
+        NONE
+    };
+}
 
-enum playerTurn
+namespace playerMode
 {
-    VIEW,
-    TAKE,
-    NADA
-};
+    enum playerMode
+    {
+        VIEW,
+        TAKE,
+        NADA
+    };
+}
 
 #endif

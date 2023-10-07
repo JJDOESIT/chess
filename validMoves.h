@@ -15,6 +15,7 @@ public:
     void printValidMoves(Piece *board[8][8], int x, int y);
     void getPawn(Piece *board[8][8], int x, int y);
     void getRook(Piece *board[8][8], int x, int y);
+    void getKing(Piece *board[8][8], int x, int y);
 };
 
 #endif
