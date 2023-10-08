@@ -4,6 +4,7 @@
 #include "input.h"
 #include "validMoves.h"
 #include <iostream>
+#include "ai.h"
 #include <SFML/Graphics.hpp>
 
 int main()
@@ -11,10 +12,12 @@ int main()
     Board board;
     board.initPieceList();
     board.fillBoard();
-    board.printPieceList();
+    board.printBoard();
 
     ValidMoves checkValidMoves;
     Input input;
+
+    AI ai;
 
     std::vector<std::vector<int>> moves;
     sf::RenderWindow window(sf::VideoMode(544, 544), "Chess");
@@ -22,7 +25,7 @@ int main()
     while (window.isOpen())
     {
         sf::Event events;
-        input.whileOpen(window, events, &board, &checkValidMoves, moves);
+        input.whileOpen(window, events, &board, &checkValidMoves, &moves, &ai);
 
         window.clear();
 
@@ -35,11 +38,11 @@ int main()
                 rect.setPosition(sf::Vector2f(i * 68, j * 68));
                 if ((i + j) % 2 == 0)
                 {
-                    rect.setFillColor(sf::Color(230, 230, 230));
+                    rect.setFillColor(sf::Color(238, 214, 176));
                 }
                 else
                 {
-                    rect.setFillColor(sf::Color(30, 30, 30));
+                    rect.setFillColor(sf::Color(184, 134, 97));
                 }
 
                 window.draw(rect);
@@ -50,7 +53,7 @@ int main()
         {
             for (int col = 0; col < 8; col++)
             {
-                if (*board.board[row][col]->getPieceType() != pieceType(NONE))
+                if (*board.board[row][col]->getPieceType() != pieceType::NONE)
                 {
                     sf::Sprite sprite = *board.board[row][col]->getSprite();
                     int *position = board.board[row][col]->getPiecePosition();
@@ -60,12 +63,14 @@ int main()
             }
         }
 
-        for (auto i : moves)
+        for (std::vector<int> i : moves)
         {
             sf::RectangleShape rect;
             rect.setSize(sf::Vector2f(68, 68));
             rect.setPosition(i[1] * 68, i[0] * 68);
-            rect.setFillColor(sf::Color(255, 0, 0, 100));
+
+            rect.setFillColor(sf::Color(255, 150, 150, 100));
+
             window.draw(rect);
         }
 

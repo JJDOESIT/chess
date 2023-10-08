@@ -1,7 +1,7 @@
 #include "input.h"
 
 // While the window is open, check for these events
-void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board, ValidMoves *checkValidMoves, std::vector<std::vector<int>> &moves)
+void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board, ValidMoves *checkValidMoves, std::vector<std::vector<int>> *moves, AI *ai)
 {
     while (window.pollEvent(events))
     {
@@ -10,15 +10,23 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
 
         if (events.type == sf::Event::MouseButtonReleased)
         {
-            if (turn == playerMode(NADA))
+            if (board->mode == playerMode::NONE)
             {
                 getPossibleMoves(window, board, checkValidMoves, moves);
             }
-            else if (turn == playerTurn(VIEW))
+            else if (board->mode == playerMode::VIEW)
             {
-                movePiece(window, board, moves);
+                int x, y;
+                getMousePosition(window, y, x);
+                board->movePieceWithCheck(moves, x, y);
             }
         }
+    }
+
+    if (*board->getCurrentTurn() == playerTurn::WHITE)
+    {
+        ai->calculateBestMove(*board, checkValidMoves, 2);
+        board->switchTurn();
     }
 }
 
@@ -33,59 +41,30 @@ void Input::getMousePosition(sf::RenderWindow &window, int &x, int &y)
 }
 
 // When a sqaure is clicked, if there is a piece on that tile, get its possible moves
-void Input::getPossibleMoves(sf::RenderWindow &window, Board *board, ValidMoves *checkValidMoves, std::vector<std::vector<int>> &moves)
+void Input::getPossibleMoves(sf::RenderWindow &window, Board *board, ValidMoves *checkValidMoves, std::vector<std::vector<int>> *moves)
 {
     int x, y;
-    getMousePosition(window, x, y);
+    getMousePosition(window, y, x);
 
-    int type = *board->board[y][x]->getPieceType();
+    int type = *board->board[x][y]->getPieceType();
+    int color = *board->board[x][y]->getPieceColor();
 
-    if (type != pieceType(NONE))
+    int colorMustMatch;
+
+    if (*board->getCurrentTurn() == playerTurn::WHITE)
     {
-        if (type == pieceType(ROOK))
+        colorMustMatch = pieceColor::WHITE;
+    }
+    else
+    {
+        colorMustMatch = pieceColor::BLACK;
+    }
+
+    if (color == colorMustMatch)
+    {
+        if (type != pieceType::NONE)
         {
-            checkValidMoves->getRook(board->board, y, x);
-        }
-        else if (type == pieceType(PAWN))
-        {
-            checkValidMoves->getPawn(board->board, y, x);
-        }
-        else if (type == pieceType(KING))
-        {
-            checkValidMoves->getKing(board->board, y, x);
-        }
-        swapBuffer[0] = y;
-        swapBuffer[1] = x;
-        moves = *board->board[y][x]->getValidMoves();
-        if (moves.size() > 0)
-        {
-            turn = playerMode(VIEW);
+            checkValidMoves->getValidMoves(board, board->board, x, y, moves);
         }
     }
-}
-
-// Move a piece
-void Input::movePiece(sf::RenderWindow &window, Board *board, std::vector<std::vector<int>> &moves)
-{
-    int x, y;
-    getMousePosition(window, x, y);
-    for (auto move : moves)
-    {
-        if (move[1] == x && move[0] == y)
-        {
-            // If the square a piece is moving too is empty, swap the two pointers
-            if (*board->board[y][x]->getPieceType() == pieceType(NONE))
-            {
-                board->swapPieces(swapBuffer[0], swapBuffer[1], y, x);
-            }
-            // Else if the square has another piece on it, destory the piece and deconstruct its data
-            else
-            {
-                board->takePiece(swapBuffer[0], swapBuffer[1], y, x);
-            }
-        }
-    }
-    // Swap modes
-    turn = playerMode(NADA);
-    moves.clear();
 }

@@ -1,5 +1,5 @@
-#ifndef PIECEENUM
-#define PIECEENUM
+#ifndef GLOBALENUM
+#define GLOBALENUM
 
 namespace pieceType
 {
@@ -31,7 +31,16 @@ namespace playerMode
     {
         VIEW,
         TAKE,
-        NADA
+        NONE
+    };
+}
+
+namespace playerTurn
+{
+    enum playerTurn
+    {
+        WHITE,
+        BLACK
     };
 }
 

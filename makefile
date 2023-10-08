@@ -8,6 +8,7 @@ rm piece.o
 rm sfml-app
 rm validMoves.o
 rm input.o
+rm ai.o
 endef
 
 all:
