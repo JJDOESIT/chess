@@ -20,7 +20,7 @@ void ValidMoves::getValidMoves(Board *board,
     }
     else if (type == pieceType::PAWN)
     {
-        getPawn(board, boardPtr, x, y, allPossibleMoves);
+        getPawn(board, boardPtr, x, y);
     }
     else if (type == pieceType::KING)
     {
@@ -51,6 +51,15 @@ void ValidMoves::getValidMoves(Board *board,
             board->mode = playerMode::VIEW;
         }
     }
+
+    if (allPossibleMoves != NULL)
+    {
+        std::vector<std::vector<int>> validMovesPtr = *boardPtr[x][y]->getValidMoves();
+        for (auto move : validMovesPtr)
+        {
+            allPossibleMoves->push_back(std::vector<std::vector<int>>{{x, y}, {move[0], move[1]}});
+        }
+    }
 }
 
 // Print out valid moves
@@ -69,7 +78,7 @@ void ValidMoves::printValidMoves(Piece *board[8][8], int x, int y)
 }
 
 // Get possible moves for pawn
-void ValidMoves::getPawn(Board *board, Piece *boardPtr[8][8], int x, int y, std::vector<std::vector<std::vector<int>>> *allPossibleMoves)
+void ValidMoves::getPawn(Board *board, Piece *boardPtr[8][8], int x, int y)
 {
     int color = *boardPtr[x][y]->getPieceColor();
     std::vector<std::vector<int>> possibleMoves;
@@ -182,15 +191,6 @@ void ValidMoves::getPawn(Board *board, Piece *boardPtr[8][8], int x, int y, std:
                     }
                 }
             }
-        }
-    }
-
-    if (allPossibleMoves != NULL)
-    {
-        std::vector<std::vector<int>> validMovesPtr = *board->board[x][y]->getValidMoves();
-        for (auto move : validMovesPtr)
-        {
-            allPossibleMoves->push_back(std::vector<std::vector<int>>{{x, y}, {move[0], move[1]}});
         }
     }
 }

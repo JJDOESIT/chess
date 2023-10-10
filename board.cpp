@@ -93,13 +93,13 @@ std::vector<Piece> *Board::getPieceList()
 }
 
 // Print the board to the console
-void Board::printBoard()
+void Board::printBoard(Piece *boardPtr[8][8])
 {
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
         {
-            int *type = board[i][j]->getPieceType();
+            int *type = boardPtr[i][j]->getPieceType();
             std::cout << *type;
         }
         std::cout << "\n";
@@ -153,36 +153,45 @@ std::vector<int> *Board::getpositionOfLastMovedBlackPiece()
 }
 
 // Swap two pieces in the board
-void Board::swapPieces(int x1, int y1, int x2, int y2)
+void Board::swapPieces(Piece *boardPtr[8][8], int x1, int y1, int x2, int y2)
 {
-    Piece *tempPiecePtr = board[x1][y1];
-    board[x1][y1] = board[x2][y2];
-    board[x2][y2] = tempPiecePtr;
+    Piece *tempPiecePtr = boardPtr[x1][y1];
+    boardPtr[x1][y1] = boardPtr[x2][y2];
+    boardPtr[x2][y2] = tempPiecePtr;
 
-    int *positionOne = board[x1][y1]->getPiecePosition();
-    int *positionTwo = board[x2][y2]->getPiecePosition();
+    int *positionOne = boardPtr[x1][y1]->getPiecePosition();
+    int *positionTwo = boardPtr[x2][y2]->getPiecePosition();
 
     int tempX = positionOne[0];
     int tempY = positionOne[1];
 
-    board[x1][y1]->setPiecePosition(positionTwo[0], positionTwo[1]);
-    board[x2][y2]->setPiecePosition(tempX, tempY);
+    boardPtr[x1][y1]->setPiecePosition(positionTwo[0], positionTwo[1]);
+    boardPtr[x2][y2]->setPiecePosition(tempX, tempY);
 }
 
 // Take a piece and deconstruct it
-void Board::takePiece(int overwriteX, int overwriteY, int overwrittenX, int overwrittenY)
+void Board::takePiece(Piece *boardPtr[8][8], int overwriteX, int overwriteY, int overwrittenX, int overwrittenY, bool simulate)
 {
-    erasePiece(overwrittenX, overwrittenY);
-    swapPieces(overwriteX, overwriteY, overwrittenX, overwrittenY);
+    if (!simulate)
+    {
+        erasePiece(boardPtr, overwrittenX, overwrittenY);
+    }
+    clearPiece(boardPtr, overwrittenX, overwrittenY);
+    swapPieces(boardPtr, overwriteX, overwriteY, overwrittenX, overwrittenY);
 }
 
 // Erase piece
-void Board::erasePiece(int x, int y)
+void Board::erasePiece(Piece *boardPtr[8][8], int x, int y)
 {
-    board[x][y]->setPieceType(pieceType::NONE);
-    board[x][y]->setPieceColor(pieceColor::NONE);
-    board[x][y]->deleteTexture();
-    board[x][x]->getValidMoves()->clear();
+    boardPtr[x][y]->deleteTexture();
+    boardPtr[x][x]->getValidMoves()->clear();
+}
+
+// Set piece type and color to null
+void Board::clearPiece(Piece *boardPtr[8][8], int x, int y)
+{
+    boardPtr[x][y]->setPieceType(pieceType::NONE);
+    boardPtr[x][y]->setPieceColor(pieceColor::NONE);
 }
 
 // Return a pointer to current turn
@@ -197,72 +206,84 @@ void Board::switchTurn()
     turn = !turn;
 }
 
-void Board::checkForPassant(int x, int y)
+// Check to see if the move being taken is a passant take
+void Board::checkForPassant(Piece *boardPtr[8][8], int x, int y, bool simulate)
 {
-
-    if (*board[x][y]->getPieceType() == pieceType::PAWN)
+    if (*boardPtr[x][y]->getPieceType() == pieceType::PAWN)
     {
-        if (*board[x][y]->getPieceColor() == pieceColor::BLACK)
+        if (*boardPtr[x][y]->getPieceColor() == pieceColor::BLACK)
         {
-            if (*board[x + 1][y]->getPieceType() == pieceType::PAWN)
+            if (*boardPtr[x + 1][y]->getPieceType() == pieceType::PAWN)
             {
+                if (!simulate)
+                {
+                    erasePiece(boardPtr, x + 1, y);
+                }
 
-                erasePiece(x + 1, y);
+                clearPiece(boardPtr, x + 1, y);
             }
         }
-        else if (*board[x][y]->getPieceColor() == pieceColor::WHITE)
+        else if (*boardPtr[x][y]->getPieceColor() == pieceColor::WHITE)
         {
-            if (*board[x - 1][y]->getPieceType() == pieceType::PAWN)
+            if (*boardPtr[x - 1][y]->getPieceType() == pieceType::PAWN)
             {
-                erasePiece(x - 1, y);
+                if (!simulate)
+                {
+                    erasePiece(boardPtr, x - 1, y);
+                }
+                clearPiece(boardPtr, x - 1, y);
             }
         }
     }
 }
 
 // Move piece
-void Board::movePiece(int x, int y)
+void Board::movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate)
 {
+
     // If the square a piece is moving too is empty, swap the two pointers
-    if (*board[x][y]->getPieceType() == pieceType::NONE)
+    if (*boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::NONE)
     {
-        swapPieces(swapBuffer[0], swapBuffer[1], x, y);
-        checkForPassant(x, y);
+        swapPieces(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY);
+        checkForPassant(boardPtr, overWrittenX, overWrittenY, simulate);
     }
     // Else if the square has another piece on it, destory the piece and deconstruct its data
     else
     {
-        takePiece(swapBuffer[0], swapBuffer[1], x, y);
+        takePiece(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY, simulate);
     }
     // Set hasMoved to be true
-    if (!*board[x][y]->getHasMoved())
+    if (!*boardPtr[overWrittenX][overWriteY]->getHasMoved())
     {
-        board[x][y]->setHasMoved();
+        boardPtr[overWrittenX][overWrittenY]->setHasMoved();
     }
 
     // Increase the times the piece has moved by 1
-    board[x][y]->increamentMoveCounter();
+    boardPtr[overWrittenX][overWrittenY]->increamentMoveCounter();
 
     // Set the position of the last moved piece to its corresponding color
-    if (*getCurrentTurn() == playerTurn::WHITE)
+    if (!simulate)
     {
-        setpositionOfLastMovedWhitePiece(x, y);
-    }
-    else
-    {
-        setpositionOfLastMovedBlackPiece(x, y);
+        if (*getCurrentTurn() == playerTurn::WHITE)
+        {
+            setpositionOfLastMovedWhitePiece(overWrittenX, overWrittenY);
+        }
+        else
+        {
+            setpositionOfLastMovedBlackPiece(overWrittenX, overWrittenY);
+        }
     }
 }
 
 // Move a piece and check if the new position is a valid move
-void Board::movePieceWithCheck(std::vector<std::vector<int>> *moves, int x, int y)
+void Board::movePieceWithCheck(Piece *boardPtr[8][8], std::vector<std::vector<int>> *moves, int x, int y)
 {
     for (auto move : *moves)
     {
         if (move[0] == x && move[1] == y)
         {
             // Move piece
-            movePiece(x, y);
+            movePiece(boardPtr, swapBuffer[0], swapBuffer[1], x, y, false);
 
             // Switch current turn
             switchTurn();
@@ -274,9 +295,7 @@ void Board::movePieceWithCheck(std::vector<std::vector<int>> *moves, int x, int 
 }
 
 // Move piece without checking if the new position is a valid move
-void Board::movePieceWithoutCheck(int x, int y)
+void Board::movePieceWithoutCheck(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate)
 {
-    movePiece(x, y);
-    switchTurn();
-    mode = playerMode::NONE;
+    movePiece(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY, simulate);
 }

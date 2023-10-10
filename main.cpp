@@ -12,7 +12,6 @@ int main()
     Board board;
     board.initPieceList();
     board.fillBoard();
-    board.printBoard();
 
     ValidMoves checkValidMoves;
     Input input;

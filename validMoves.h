@@ -13,7 +13,7 @@ public:
     bool checkBoundary(int x, int y);
     void getValidMoves(Board *board, Piece *boardPtr[8][8], int x, int y, std::vector<std::vector<int>> *moves = NULL, std::vector<std::vector<std::vector<int>>> *allPossibleMoves = NULL);
     void printValidMoves(Piece *board[8][8], int x, int y);
-    void getPawn(Board *board, Piece *boardPtr[8][8], int x, int y, std::vector<std::vector<std::vector<int>>> *allPossibleMoves = NULL);
+    void getPawn(Board *board, Piece *boardPtr[8][8], int x, int y);
     void getRook(Piece *board[8][8], int x, int y);
     void getKnight(Piece *board[8][8], int x, int y);
     void getBishop(Piece *board[8][8], int x, int y);

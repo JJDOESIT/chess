@@ -24,13 +24,14 @@ public:
 
     void initPieceList();
     std::vector<Piece> *getPieceList();
-    void printBoard();
+    void printBoard(Piece *boardPtr[8][8]);
     void initBoard();
     void fillBoard();
     void overwritePiece(int type, int color, int x, int y);
-    void swapPieces(int x1, int y1, int x2, int y2);
-    void takePiece(int overwriteX, int overwriteY, int overwrittenX, int overwrittenY);
-    void erasePiece(int x, int y);
+    void swapPieces(Piece *boardPtr[8][8], int x1, int y1, int x2, int y2);
+    void takePiece(Piece *boardPtr[8][8], int overwriteX, int overwriteY, int overwrittenX, int overwrittenY, bool simulate = false);
+    void erasePiece(Piece *boardPtr[8][8], int x, int y);
+    void clearPiece(Piece *boardPtr[8][8], int x, int y);
 
     void setpositionOfLastMovedWhitePiece(int x, int y);
     std::vector<int> *getpositionOfLastMovedWhitePiece();
@@ -41,13 +42,13 @@ public:
     int *getCurrentTurn();
     void switchTurn();
 
-    void checkForPassant(int x, int y);
+    void checkForPassant(Piece *boardPtr[8][8], int x, int y, bool simulate = false);
 
-    void movePiece(int x, int y);
+    void movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate);
 
-    void movePieceWithCheck(std::vector<std::vector<int>> *moves, int x, int y);
+    void movePieceWithCheck(Piece *boardPtr[8][8], std::vector<std::vector<int>> *moves, int x, int y);
 
-    void movePieceWithoutCheck(int x, int y);
+    void movePieceWithoutCheck(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate = false);
 };
 
 #endif

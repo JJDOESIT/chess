@@ -9,9 +9,10 @@
 class AI
 {
 public:
-    int calculateBestMove(Board board, ValidMoves *checkValidMoves, int depth);
+    std::vector<int> calculateBestMove(Board *board, Piece *boardCopy[8][8], ValidMoves *checkValidMoves, int depth);
     void copyArray(Piece *copyFrom[8][8], Piece *copyTo[8][8]);
-    void rankBoard(Piece *board[8][8], int &rank, int color, bool negate = false);
+    void deleteArray(Piece *array[8][8]);
+    int rankBoard(Piece *boardPtr[8][8], int color, bool negate = false);
 };
 
 #endif
