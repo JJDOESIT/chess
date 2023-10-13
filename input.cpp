@@ -25,12 +25,13 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
 
     if (*board->getCurrentTurn() == playerTurn::WHITE)
     {
-        std::vector<int> move = ai->calculateBestMove(board, board->board, checkValidMoves, 3);
-        if (move[0] != -1 && move[1] != -1 && move[2] != -1 && move[3] != -1)
-        {
-            std::cout << move[0] << ", " << move[1] << std::endl;
-            board->movePieceWithoutCheck(board->board, move[0], move[1], move[2], move[3]);
-        }
+        Piece *copyBoard[8][8];
+        board->copyArray(board->board, copyBoard);
+
+        int count = 0;
+        std::vector<int> move = ai->calculateBestMove(board, board->board, checkValidMoves, 4, pieceColor::WHITE, -9999, 9999, count);
+        board->movePieceWithoutCheck(board->board, move[0], move[1], move[2], move[3]);
+        board->deleteArray(copyBoard);
         board->switchTurn();
     }
 }

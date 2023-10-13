@@ -14,6 +14,21 @@ private:
     std::vector<sf::Texture> textureList;
     std::vector<int> positionOfLastMovedWhitePiece = {-1, -1};
     std::vector<int> positionOfLastMovedBlackPiece = {-1, -1};
+
+    struct moveData
+    {
+        int positionOfOverWriteX;
+        int positionOfOverWriteY;
+        int positionOfOverWrittenX;
+        int positionOfOverWrittenY;
+
+        int overWriteType;
+        int overWrittenType;
+
+        int overWriteColor;
+        int overWrittenColor;
+    } moveHistory;
+
     int turn = playerTurn::WHITE;
 
 public:
@@ -49,6 +64,18 @@ public:
     void movePieceWithCheck(Piece *boardPtr[8][8], std::vector<std::vector<int>> *moves, int x, int y);
 
     void movePieceWithoutCheck(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate = false);
+
+    void copyArray(Piece *copyFrom[8][8], Piece *copyTo[8][8]);
+
+    void deleteArray(Piece *array[8][8]);
+
+    void undoMove(Piece *boardPtr[8][8], int positionOfOverWriteX,
+                  int positionOfOverWriteY,
+                  int positionOfOverWrittenX,
+                  int positionOfOverWrittenY, int overWriteType,
+                  int overWrittenType,
+                  int overWriteColor,
+                  int overWrittenColor);
 };
 
 #endif

@@ -244,26 +244,29 @@ void Board::movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int
     // If the square a piece is moving too is empty, swap the two pointers
     if (*boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::NONE)
     {
+
         swapPieces(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY);
-        checkForPassant(boardPtr, overWrittenX, overWrittenY, simulate);
+        // checkForPassant(boardPtr, overWrittenX, overWrittenY, simulate);
     }
     // Else if the square has another piece on it, destory the piece and deconstruct its data
     else
     {
+
         takePiece(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY, simulate);
     }
-    // Set hasMoved to be true
-    if (!*boardPtr[overWrittenX][overWriteY]->getHasMoved())
-    {
-        boardPtr[overWrittenX][overWrittenY]->setHasMoved();
-    }
-
-    // Increase the times the piece has moved by 1
-    boardPtr[overWrittenX][overWrittenY]->increamentMoveCounter();
 
     // Set the position of the last moved piece to its corresponding color
     if (!simulate)
     {
+        // Set hasMoved to be true
+        if (!*boardPtr[overWrittenX][overWriteY]->getHasMoved())
+        {
+            boardPtr[overWrittenX][overWrittenY]->setHasMoved();
+        }
+
+        // Increase the times the piece has moved by 1
+        boardPtr[overWrittenX][overWrittenY]->increamentMoveCounter();
+
         if (*getCurrentTurn() == playerTurn::WHITE)
         {
             setpositionOfLastMovedWhitePiece(overWrittenX, overWrittenY);
@@ -298,4 +301,51 @@ void Board::movePieceWithCheck(Piece *boardPtr[8][8], std::vector<std::vector<in
 void Board::movePieceWithoutCheck(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate)
 {
     movePiece(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY, simulate);
+}
+
+// Undo move (used in AI calculations)
+void Board::undoMove(Piece *boardPtr[8][8], int positionOfOverWriteX,
+                     int positionOfOverWriteY,
+                     int positionOfOverWrittenX,
+                     int positionOfOverWrittenY, int overWriteType,
+                     int overWrittenType,
+                     int overWriteColor,
+                     int overWrittenColor)
+{
+    swapPieces(boardPtr,
+               positionOfOverWriteX,
+               positionOfOverWriteY,
+               positionOfOverWrittenX,
+               positionOfOverWrittenY);
+
+    board[positionOfOverWriteX][positionOfOverWriteY]->setPieceType(overWriteType);
+    board[positionOfOverWriteX][positionOfOverWriteY]->setPieceColor(overWriteColor);
+
+    board[positionOfOverWrittenX][positionOfOverWrittenY]->setPieceType(overWrittenType);
+    board[positionOfOverWrittenX][positionOfOverWrittenY]->setPieceColor(overWrittenColor);
+}
+
+// Copy data from one board to another
+void Board::copyArray(Piece *copyFrom[8][8], Piece *copyTo[8][8])
+{
+    for (int row = 0; row < 8; row++)
+    {
+        for (int col = 0; col < 8; col++)
+        {
+            Piece *newPiece = new Piece(*copyFrom[row][col]);
+            copyTo[row][col] = newPiece;
+        }
+    }
+}
+
+// Deconstruct board state
+void Board::deleteArray(Piece *array[8][8])
+{
+    for (int row = 0; row < 8; row++)
+    {
+        for (int col = 0; col < 8; col++)
+        {
+            delete array[row][col];
+        }
+    }
 }

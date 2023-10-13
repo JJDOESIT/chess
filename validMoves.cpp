@@ -14,29 +14,27 @@ void ValidMoves::getValidMoves(Board *board,
 {
     int type = *boardPtr[x][y]->getPieceType();
     boardPtr[x][y]->getValidMoves()->clear();
-    if (type == pieceType::ROOK)
+
+    switch (type)
     {
+    case (pieceType::ROOK):
         getRook(boardPtr, x, y);
-    }
-    else if (type == pieceType::PAWN)
-    {
+        break;
+    case (pieceType::PAWN):
         getPawn(board, boardPtr, x, y);
-    }
-    else if (type == pieceType::KING)
-    {
+        break;
+    case (pieceType::KING):
         getKing(boardPtr, x, y);
-    }
-    else if (type == pieceType::QUEEN)
-    {
+        break;
+    case (pieceType::QUEEN):
         getQueen(boardPtr, x, y);
-    }
-    else if (type == pieceType::BISHOP)
-    {
+        break;
+    case (pieceType::BISHOP):
         getBishop(boardPtr, x, y);
-    }
-    else if (type == pieceType::KNIGHT)
-    {
+        break;
+    case (pieceType::KNIGHT):
         getKnight(boardPtr, x, y);
+        break;
     }
 
     board->swapBuffer[0] = x;
@@ -52,6 +50,7 @@ void ValidMoves::getValidMoves(Board *board,
         }
     }
 
+    // If allPossibleMoves is passed as a parameter, populate it with the exisitng values in valid moves
     if (allPossibleMoves != NULL)
     {
         std::vector<std::vector<int>> validMovesPtr = *boardPtr[x][y]->getValidMoves();
@@ -92,7 +91,7 @@ void ValidMoves::getPawn(Board *board, Piece *boardPtr[8][8], int x, int y)
         // Check to see if the pawn can move two spaces
         if (!*boardPtr[x][y]->getHasMoved())
         {
-            if (*boardPtr[x - 1][y]->getPieceType() == pieceType::NONE)
+            if (*boardPtr[x - 1][y]->getPieceType() == pieceType::NONE && *boardPtr[x - 1][y]->getPieceType() != pieceType::KING)
             {
                 possibleMoves.push_back(std::vector<int>{-2, 0});
             }
@@ -107,7 +106,7 @@ void ValidMoves::getPawn(Board *board, Piece *boardPtr[8][8], int x, int y)
         // Check to see if the pawn can move two space
         if (!*boardPtr[x][y]->getHasMoved())
         {
-            if (*boardPtr[x + 1][y]->getPieceType() == pieceType::NONE)
+            if (*boardPtr[x + 1][y]->getPieceType() == pieceType::NONE && *boardPtr[x + 1][y]->getPieceType() != pieceType::KING)
             {
                 possibleMoves.push_back(std::vector<int>{2, 0});
             }
@@ -120,17 +119,22 @@ void ValidMoves::getPawn(Board *board, Piece *boardPtr[8][8], int x, int y)
         if (checkBoundary(x + move[0], y + move[1]))
         {
             int nextColor = *boardPtr[x + move[0]][y + move[1]]->getPieceColor();
+            int nextType = *boardPtr[x + move[0]][y + move[1]]->getPieceType();
             if (move[1] == 0)
             {
+                // If the possible move is an empty cell
                 if (nextColor == pieceColor::NONE)
                 {
+                    // Move forward
                     boardPtr[x][y]->addMove(x + move[0], y + move[1]);
                 }
             }
             else
             {
-                if (nextColor != color && nextColor != pieceColor::NONE)
+                // If the possible move is not the same color as the moving piece, and the possible move is not an empty cell or a king
+                if (nextColor != color && nextColor != pieceColor::NONE && nextType != pieceType::KING)
                 {
+                    // Move diagonal
                     boardPtr[x][y]->addMove(x + move[0], y + move[1]);
                 }
             }
@@ -257,13 +261,19 @@ void ValidMoves::calculateLinearMoves(Piece *board[8][8], std::vector<std::vecto
             pieceData.move = std::vector<int>{x, y};
 
             int color = *board[originalX + x][originalY + y]->getPieceColor();
+            int type = *board[originalX + x][originalY + y]->getPieceType();
+
+            // If the possible move is an empty cell
             if (color == pieceColor::NONE)
             {
+                // Add to valid moves and the stack
                 stack.push_back(pieceData);
                 board[originalX][originalY]->addMove(originalX + x, originalY + y);
             }
-            else if (color != *board[originalX][originalY]->getPieceColor())
+            // If the possible move color is not equal to the moving color and the possible move is not a king piece
+            else if (color != *board[originalX][originalY]->getPieceColor() && type != pieceType::KING)
             {
+                // Add to valid moves but not the stack
                 board[originalX][originalY]->addMove(originalX + x, originalY + y);
             }
         }
@@ -284,15 +294,20 @@ void ValidMoves::calculateLinearMoves(Piece *board[8][8], std::vector<std::vecto
         {
             int color = *board[originalX][originalY]->getPieceColor();
             int futureColor = *board[x + futureX][y + futureY]->getPieceColor();
+
+            // If the possible move is an empty cell
             if (futureColor == pieceColor::NONE)
             {
+                // Update position and add back on the stack and valid moves
                 move.position[0] = x + futureX;
                 move.position[1] = y + futureY;
                 stack.push_back(move);
                 board[originalX][originalY]->addMove(x + futureX, y + futureY);
             }
-            else if (color != futureColor)
+            // If the possible move color is not equal to the moving color, and the possible move type is not a king
+            else if (color != futureColor && *board[x + futureX][y + futureY]->getPieceType() != pieceType::KING)
             {
+                // Add move to valid moves but not the stack
                 board[originalX][originalY]->addMove(x + futureX, y + futureY);
             }
         }
@@ -302,11 +317,12 @@ void ValidMoves::calculateLinearMoves(Piece *board[8][8], std::vector<std::vecto
 // Calculate possible moves given a set vector of moves
 void ValidMoves::calculateSingleMoves(Piece *board[8][8], std::vector<std::vector<int>> possibleMoves, int x, int y)
 {
-    for (auto move : possibleMoves)
+    for (std::vector<int> move : possibleMoves)
     {
         if (checkBoundary(x + move[0], y + move[1]))
         {
-            if (*board[x + move[0]][y + move[1]]->getPieceColor() != *board[x][y]->getPieceColor())
+            // If the possible move color is not the same as the moving color and the possible move is not a king
+            if (*board[x + move[0]][y + move[1]]->getPieceColor() != *board[x][y]->getPieceColor() && *board[x + move[0]][y + move[1]]->getPieceType() != pieceType::KING)
             {
                 board[x][y]->addMove(x + move[0], y + move[1]);
             }
