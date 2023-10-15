@@ -329,3 +329,83 @@ void ValidMoves::calculateSingleMoves(Piece *board[8][8], std::vector<std::vecto
         }
     }
 }
+
+void ValidMoves::isKingInCheck(Piece *board[8][8])
+{
+    for (int row = 0; row < 8; row++)
+    {
+        for (int col = 0; col < 8; col++)
+        {
+            if (*board[row][col]->getPieceType() == pieceType::KING)
+            {
+                int originalX = row;
+                int originalY = col;
+                int color = *board[row][col]->getPieceColor();
+
+                // Check if a king is in check by a pawn
+                std::vector<std::vector<int>> possiblePawnMoves;
+                if (color == pieceColor::WHITE)
+                {
+                    possiblePawnMoves = {{1, 1}, {1, -1}};
+                }
+                else
+                {
+                    possiblePawnMoves = {{-1, 1}, {-1, -1}};
+                }
+                for (std::vector<int> move : possiblePawnMoves)
+                {
+                    if (checkBoundary(originalX + move[0], originalY + move[1]))
+                    {
+                        if (*board[originalX + move[0]][originalY + move[1]]->getPieceColor() != color && *board[originalX + move[0]][originalY + move[1]]->getPieceType() == pieceType::PAWN)
+                        {
+                            std::cout << "CHECK" << std::endl;
+                        }
+                    }
+                }
+
+                // Check if a king is in check by a rook, bishop, or queen
+                std::vector<std::vector<int>> possibleQueenMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+                std::vector<std::vector<int>> possibleRookMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+                checkLinearMoves(board, possibleRookMoves, originalX, originalY, pieceType::ROOK);
+                checkLinearMoves(board, possibleQueenMoves, originalX, originalY, pieceType::QUEEN);
+            }
+        }
+    }
+}
+
+void ValidMoves::checkLinearMoves(Piece *board[8][8], std::vector<std::vector<int>> possibleMoves, int x, int y, int type)
+{
+    for (std::vector<int> move : possibleMoves)
+    {
+        int tempX = x;
+        int tempY = y;
+        bool continueSearching = true;
+        while (continueSearching)
+        {
+            if (checkBoundary(tempX + move[0], tempY + move[1]))
+            {
+                // If the next move is an empty cell
+                if (*board[tempX + move[0]][tempY + move[1]]->getPieceColor() == pieceColor::NONE)
+                {
+                    tempX += move[0];
+                    tempY += move[1];
+                }
+                // Else if the next move is an opposite color than the king and is equals the correct type
+                else if (*board[tempX + move[0]][tempY + move[1]]->getPieceColor() != *board[x][y]->getPieceColor() && *board[tempX + move[0]][tempY + move[1]]->getPieceType() == type)
+                {
+                    continueSearching = false;
+                    std::cout << "CHECK" << std::endl;
+                }
+                else
+                {
+                    continueSearching = false;
+                }
+            }
+            else
+            {
+                continueSearching = false;
+            }
+        }
+    }
+}

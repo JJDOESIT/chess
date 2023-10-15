@@ -61,7 +61,7 @@ public:
 
     void movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate);
 
-    void movePieceWithCheck(Piece *boardPtr[8][8], std::vector<std::vector<int>> *moves, int x, int y);
+    void movePieceWithCheck(sf::RenderWindow &window, Piece *boardPtr[8][8], std::vector<std::vector<int>> *moves, int x, int y);
 
     void movePieceWithoutCheck(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate = false);
 
@@ -76,6 +76,10 @@ public:
                   int overWrittenType,
                   int overWriteColor,
                   int overWrittenColor);
+
+    void drawSprites(sf::RenderWindow &window);
+    void drawBoard(sf::RenderWindow &window);
+    void drawPossibleMoves(sf::RenderWindow &window, std::vector<std::vector<int>> *moves);
 };
 
 #endif

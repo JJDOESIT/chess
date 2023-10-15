@@ -22,6 +22,10 @@ public:
 
     void calculateLinearMoves(Piece *board[8][8], std::vector<std::vector<int>> possibleMoves, int x, int y);
     void calculateSingleMoves(Piece *board[8][8], std::vector<std::vector<int>> possibleMoves, int x, int y);
+
+    // Functions for calculating check
+    void isKingInCheck(Piece *board[8][8]);
+    void checkLinearMoves(Piece *board[8][8], std::vector<std::vector<int>> possibleMoves, int x, int y, int type);
 };
 
 #endif

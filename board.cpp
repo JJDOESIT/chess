@@ -279,7 +279,7 @@ void Board::movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int
 }
 
 // Move a piece and check if the new position is a valid move
-void Board::movePieceWithCheck(Piece *boardPtr[8][8], std::vector<std::vector<int>> *moves, int x, int y)
+void Board::movePieceWithCheck(sf::RenderWindow &window, Piece *boardPtr[8][8], std::vector<std::vector<int>> *moves, int x, int y)
 {
     for (auto move : *moves)
     {
@@ -288,11 +288,16 @@ void Board::movePieceWithCheck(Piece *boardPtr[8][8], std::vector<std::vector<in
             // Move piece
             movePiece(boardPtr, swapBuffer[0], swapBuffer[1], x, y, false);
 
+            // Re-draw the board
+            drawBoard(window);
+            drawSprites(window);
+            window.display();
+
             // Switch current turn
             switchTurn();
         }
     }
-    // Swap modes
+    // Swap modes and clear possible moves list
     mode = playerMode::NONE;
     moves->clear();
 }
@@ -347,5 +352,60 @@ void Board::deleteArray(Piece *array[8][8])
         {
             delete array[row][col];
         }
+    }
+}
+
+// Draw all sprites to the board
+void Board::drawSprites(sf::RenderWindow &window)
+{
+    for (int row = 0; row < 8; row++)
+    {
+        for (int col = 0; col < 8; col++)
+        {
+            if (*board[row][col]->getPieceType() != pieceType::NONE)
+            {
+                sf::Sprite sprite = *board[row][col]->getSprite();
+                int *position = board[row][col]->getPiecePosition();
+                sprite.setPosition(sf::Vector2f(position[1] * 68, position[0] * 68));
+                window.draw(sprite);
+            }
+        }
+    }
+}
+
+// Draw background tiles
+void Board::drawBoard(sf::RenderWindow &window)
+{
+    for (int row = 0; row < 8; row++)
+    {
+        for (int col = 0; col < 8; col++)
+        {
+            sf::RectangleShape rect;
+            rect.setSize(sf::Vector2f(68, 68));
+            rect.setPosition(sf::Vector2f(row * 68, col * 68));
+            if ((row + col) % 2 == 0)
+            {
+                rect.setFillColor(sf::Color(238, 214, 176));
+            }
+            else
+            {
+                rect.setFillColor(sf::Color(184, 134, 97));
+            }
+
+            window.draw(rect);
+        }
+    }
+}
+
+// Draw all possible moves when a piece is clicked
+void Board::drawPossibleMoves(sf::RenderWindow &window, std::vector<std::vector<int>> *moves)
+{
+    for (std::vector<int> i : *moves)
+    {
+        sf::RectangleShape possibleMove;
+        possibleMove.setSize(sf::Vector2f(68, 68));
+        possibleMove.setPosition(i[1] * 68, i[0] * 68);
+        possibleMove.setFillColor(sf::Color(255, 150, 150, 100));
+        window.draw(possibleMove);
     }
 }

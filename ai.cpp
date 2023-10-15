@@ -4,7 +4,7 @@ std::vector<int> AI::calculateBestMove(Board *board,
                                        Piece *boardCopy[8][8],
                                        ValidMoves *checkValidMoves,
                                        int depth,
-                                       int maximizingColor, int alpha, int beta, int &count)
+                                       int maximizingColor, int alpha, int beta)
 {
 
     // If the break case depth = 0 is reached
@@ -67,15 +67,13 @@ std::vector<int> AI::calculateBestMove(Board *board,
 
         board->movePiece(boardCopy, startX, startY, endX, endY, true);
 
-        std::cout << count << std::endl;
-        count += 1;
         if (maximizingColor == pieceColor::WHITE)
         {
-            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::BLACK, alpha, beta, count);
+            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::BLACK, alpha, beta);
         }
         else
         {
-            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::WHITE, alpha, beta, count);
+            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::WHITE, alpha, beta);
         }
 
         board->undoMove(boardCopy, startX, startY, endX, endY, startType, endType, startColor, endColor);

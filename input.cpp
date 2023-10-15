@@ -18,21 +18,21 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
             {
                 int x, y;
                 getMousePosition(window, y, x);
-                board->movePieceWithCheck(board->board, moves, x, y);
+                board->movePieceWithCheck(window, board->board, moves, x, y);
+                checkValidMoves->isKingInCheck(board->board);
             }
         }
     }
 
     if (*board->getCurrentTurn() == playerTurn::WHITE)
     {
-        Piece *copyBoard[8][8];
+        /* Piece *copyBoard[8][8];
         board->copyArray(board->board, copyBoard);
 
-        int count = 0;
-        std::vector<int> move = ai->calculateBestMove(board, board->board, checkValidMoves, 4, pieceColor::WHITE, -9999, 9999, count);
+        std::vector<int> move = ai->calculateBestMove(board, board->board, checkValidMoves, 4, pieceColor::WHITE, -9999, 9999);
         board->movePieceWithoutCheck(board->board, move[0], move[1], move[2], move[3]);
         board->deleteArray(copyBoard);
-        board->switchTurn();
+        board->switchTurn(); */
     }
 }
 
