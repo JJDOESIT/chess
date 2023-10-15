@@ -35,6 +35,12 @@ public:
     int mode = playerMode::NONE;
     int swapBuffer[2];
 
+    bool whiteKingInCheck = false;
+    bool blackKingInCheck = false;
+
+    std::vector<std::vector<int>> whiteCheckMovesList;
+    std::vector<std::vector<int>> blackCheckMovesList;
+
     Piece *board[8][8] = {nullptr};
 
     void initPieceList();

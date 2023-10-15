@@ -19,7 +19,7 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
                 int x, y;
                 getMousePosition(window, y, x);
                 board->movePieceWithCheck(window, board->board, moves, x, y);
-                checkValidMoves->isKingInCheck(board->board);
+                checkValidMoves->isKingInCheck(board, board->board);
             }
         }
     }
@@ -70,7 +70,7 @@ void Input::getPossibleMoves(sf::RenderWindow &window, Board *board, ValidMoves 
     {
         if (type != pieceType::NONE)
         {
-            checkValidMoves->getValidMoves(board, board->board, x, y, moves);
+            checkValidMoves->getValidMoves(board, board->board, x, y, moves, NULL);
         }
     }
 }
