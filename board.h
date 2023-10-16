@@ -35,11 +35,9 @@ public:
     int mode = playerMode::NONE;
     int swapBuffer[2];
 
-    bool whiteKingInCheck = false;
-    bool blackKingInCheck = false;
+    bool inCheck = false;
 
-    std::vector<std::vector<int>> whiteCheckMovesList;
-    std::vector<std::vector<int>> blackCheckMovesList;
+    std::vector<std::vector<int>> checkMovesList;
 
     Piece *board[8][8] = {nullptr};
 
@@ -86,6 +84,8 @@ public:
     void drawSprites(sf::RenderWindow &window);
     void drawBoard(sf::RenderWindow &window);
     void drawPossibleMoves(sf::RenderWindow &window, std::vector<std::vector<int>> *moves);
+
+    friend class Input;
 };
 
 #endif

@@ -12,14 +12,28 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
         {
             if (board->mode == playerMode::NONE)
             {
-                getPossibleMoves(window, board, checkValidMoves, moves);
+                bool check;
+
+                std::vector<std::vector<int>> checkMoves;
+                for (int row = 0; row < 8; row++)
+                {
+                    for (int col = 0; col < 8; col++)
+                    {
+                        if (*board->board[row][col]->getPieceType() == pieceType::KING && *board->board[row][col]->getPieceColor() == board->turn)
+                        {
+
+                            checkValidMoves->isKingInCheck(board->board, row, col, board->turn, checkMoves, check);
+
+                            getPossibleMoves(window, board, checkValidMoves, moves, checkMoves, check);
+                        }
+                    }
+                }
             }
             else if (board->mode == playerMode::VIEW)
             {
                 int x, y;
                 getMousePosition(window, y, x);
                 board->movePieceWithCheck(window, board->board, moves, x, y);
-                checkValidMoves->isKingInCheck(board, board->board);
             }
         }
     }
@@ -47,7 +61,11 @@ void Input::getMousePosition(sf::RenderWindow &window, int &x, int &y)
 }
 
 // When a sqaure is clicked, if there is a piece on that tile, get its possible moves
-void Input::getPossibleMoves(sf::RenderWindow &window, Board *board, ValidMoves *checkValidMoves, std::vector<std::vector<int>> *moves)
+void Input::getPossibleMoves(sf::RenderWindow &window, Board *board,
+                             ValidMoves *checkValidMoves,
+                             std::vector<std::vector<int>> *moves,
+                             std::vector<std::vector<int>> checkMoves,
+                             bool check)
 {
     int x, y;
     getMousePosition(window, y, x);
@@ -70,7 +88,7 @@ void Input::getPossibleMoves(sf::RenderWindow &window, Board *board, ValidMoves 
     {
         if (type != pieceType::NONE)
         {
-            checkValidMoves->getValidMoves(board, board->board, x, y, moves, NULL);
+            checkValidMoves->getValidMoves(board, board->board, x, y, checkMoves, check, moves, NULL);
         }
     }
 }
