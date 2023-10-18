@@ -14,7 +14,7 @@ std::vector<int> AI::calculateBestMove(Board *board,
         int rank;
         rankBoard(boardCopy, maximizingColor, whiteScore, blackScore);
 
-        // If the maximizing color is white, calculate a hopefully positive score score
+        // If the maximizing color is white, calculate a hopefully positive score
         if (maximizingColor == pieceColor::WHITE)
         {
             rank = whiteScore - blackScore;
@@ -32,6 +32,22 @@ std::vector<int> AI::calculateBestMove(Board *board,
     int minRank = 9999, maxRank = -9999;
     int rank;
 
+    // Loop through the board to find the kings position
+    for (int row = 0; row < 8; row++)
+    {
+        for (int col = 0; col < 8; col++)
+        {
+            // If the piece is a king and its color matches the current current player
+            if (*board->board[row][col]->getPieceType() == pieceType::KING && *board->board[row][col]->getPieceColor() == board->turn)
+            {
+                // Check if the king is in check
+                checkValidMoves->isKingInCheck(board->board, row, col, board->turn, checkMoves, check);
+                // Get possible moves for the piece
+                getPossibleMoves(window, board, checkValidMoves, moves, checkMoves, check);
+            }
+        }
+    }
+
     // Loop through the board
     for (int row = 0; row < 8; row++)
     {
@@ -40,11 +56,12 @@ std::vector<int> AI::calculateBestMove(Board *board,
             // If the piece color equals the maximizing color
             if (*boardCopy[row][col]->getPieceColor() == maximizingColor)
             {
-                // Add the move to the valid moves list
+                // Check if the
                 bool check;
-
                 std::vector<std::vector<int>> checkMoves;
                 checkValidMoves->isKingInCheck(boardCopy, row, col, maximizingColor, checkMoves, check);
+
+                // Add the move to the valid moves list
                 checkValidMoves->getValidMoves(board, boardCopy, row, col, checkMoves, check, NULL, &allPossibleMoves);
             }
         }

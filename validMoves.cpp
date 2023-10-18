@@ -43,16 +43,6 @@ void ValidMoves::getValidMoves(Board *board,
     board->swapBuffer[0] = x;
     board->swapBuffer[1] = y;
 
-    // If allPossibleMoves is passed as a parameter, populate it with the exisitng values in valid moves
-    if (allPossibleMoves != NULL)
-    {
-        std::vector<std::vector<int>> validMovesPtr = *boardPtr[x][y]->getValidMoves();
-        for (auto move : validMovesPtr)
-        {
-            allPossibleMoves->push_back(std::vector<std::vector<int>>{{x, y}, {move[0], move[1]}});
-        }
-    }
-
     // Alter possible moves based on if king is in check
     if (isInCheck)
     {
@@ -80,6 +70,16 @@ void ValidMoves::getValidMoves(Board *board,
         if (moves->size() > 0)
         {
             board->mode = playerMode::VIEW;
+        }
+    }
+
+    // If allPossibleMoves is passed as a parameter, populate it with the exisitng values in valid moves
+    if (allPossibleMoves != NULL)
+    {
+        std::vector<std::vector<int>> validMovesPtr = *boardPtr[x][y]->getValidMoves();
+        for (auto move : validMovesPtr)
+        {
+            allPossibleMoves->push_back(std::vector<std::vector<int>>{{x, y}, {move[0], move[1]}});
         }
     }
 }
@@ -373,44 +373,23 @@ void ValidMoves::calculateSingleMoves(Piece *board[8][8], std::vector<std::vecto
     }
 }
 
-void ValidMoves::isKingInCheck(Piece *boardPtr[8][8], int x, int y, int color, std::vector<std::vector<int>> &checkMoves, bool &isInCheck)
+// See if the king is in check based on the perspective of the king
+void ValidMoves::isKingInCheck(Piece *boardPtr[8][8], int kingX, int kingY, int kingColor, std::vector<std::vector<int>> &checkMoves, bool &isInCheck)
 {
-
-    int originalX = x;
-    int originalY = y;
-
     checkMoves.clear();
 
-    // Check if a king is in check by a pawn
-    std::vector<std::vector<int>> possiblePawnMoves;
-
-    if (color == pieceColor::WHITE)
-    {
-        possiblePawnMoves = {{1, 1}, {1, -1}};
-    }
-    else
-    {
-        possiblePawnMoves = {{-1, 1}, {-1, -1}};
-    }
-    for (std::vector<int> move : possiblePawnMoves)
-    {
-        if (checkBoundary(originalX + move[0], originalY + move[1]))
-        {
-            if (*boardPtr[originalX + move[0]][originalY + move[1]]->getPieceColor() != color && *boardPtr[originalX + move[0]][originalY + move[1]]->getPieceType() == pieceType::PAWN)
-            {
-                checkMoves.push_back(std::vector<int>{originalX + move[0], originalY + move[1]});
-            }
-        }
-    }
+    // Detect if a king is in check by a pawn
+    detectCheckFromPawn(boardPtr, kingX, kingY, kingColor, checkMoves);
 
     // Check if a king is in check by a rook, bishop, or queen
-    std::vector<std::vector<int>> possibleQueenMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-    std::vector<std::vector<int>> possibleRookMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-    std::vector<std::vector<int>> possibleBishopMoves = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
-    checkLinearMoves(boardPtr, possibleRookMoves, originalX, originalY, color, pieceType::ROOK, checkMoves);
-    checkLinearMoves(boardPtr, possibleQueenMoves, originalX, originalY, color, pieceType::QUEEN, checkMoves);
-    checkLinearMoves(boardPtr, possibleBishopMoves, originalX, originalY, color, pieceType::BISHOP, checkMoves);
+    detectCheckFromLinearPieces(boardPtr, kingX, kingY, kingColor, checkMoves);
+
+    std::vector<std::vector<int>> possibleKnightMoves = {{2, 1}, {2, -1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {1, -2}, {-1, -2}};
+    std::vector<std::vector<int>> possibleKingMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+
+    detectCheckFromSingularPieces(boardPtr, possibleKnightMoves, kingX, kingY, kingColor, pieceType::KNIGHT, checkMoves);
+    detectCheckFromSingularPieces(boardPtr, possibleKingMoves, kingX, kingY, kingColor, pieceType::KING, checkMoves);
 
     if (checkMoves.size() > 0)
     {
@@ -422,12 +401,41 @@ void ValidMoves::isKingInCheck(Piece *boardPtr[8][8], int x, int y, int color, s
     }
 }
 
-void ValidMoves::checkLinearMoves(Piece *board[8][8], std::vector<std::vector<int>> possibleMoves, int x, int y, int color, int type, std::vector<std::vector<int>> &finalXRayPath)
+void ValidMoves::detectCheckFromPawn(Piece *boardPtr[8][8], int kingX, int kingY, int kingColor, std::vector<std::vector<int>> &checkMoves)
 {
-    for (std::vector<int> move : possibleMoves)
+    // Check if a king is in check by a pawn
+    std::vector<std::vector<int>> possiblePawnMoves;
+
+    // Possible spaces where a white pawn could take a black king
+    if (kingColor == pieceColor::WHITE)
     {
-        int tempX = x;
-        int tempY = y;
+        possiblePawnMoves = {{1, 1}, {1, -1}};
+    }
+    // Possible spaces where a black pawn could take a white king
+    else
+    {
+        possiblePawnMoves = {{-1, 1}, {-1, -1}};
+    }
+    for (std::vector<int> move : possiblePawnMoves)
+    {
+        if (checkBoundary(kingX + move[0], kingY + move[1]))
+        {
+            // If the space is the opposite color of the king and is a pawn
+            if (*boardPtr[kingX + move[0]][kingY + move[1]]->getPieceColor() != kingColor && *boardPtr[kingX + move[0]][kingY + move[1]]->getPieceType() == pieceType::PAWN)
+            {
+                checkMoves.push_back(std::vector<int>{kingX + move[0], kingY + move[1]});
+            }
+        }
+    }
+}
+
+void ValidMoves::detectCheckFromLinearPieces(Piece *board[8][8], int kingX, int kingY, int kingColor, std::vector<std::vector<int>> &finalXRayPath)
+{
+    std::vector<std::vector<int>> possibleLinearMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+    for (std::vector<int> move : possibleLinearMoves)
+    {
+        int tempX = kingX;
+        int tempY = kingY;
         bool continueSearching = true;
         std::vector<std::vector<int>> tempXRayPath;
 
@@ -435,16 +443,18 @@ void ValidMoves::checkLinearMoves(Piece *board[8][8], std::vector<std::vector<in
         {
             if (checkBoundary(tempX + move[0], tempY + move[1]))
             {
+                int futureType = *board[tempX + move[0]][tempY + move[1]]->getPieceType();
+                int futureColor = *board[tempX + move[0]][tempY + move[1]]->getPieceColor();
                 // If the next move is an empty cell
-                if (*board[tempX + move[0]][tempY + move[1]]->getPieceColor() == pieceColor::NONE ||
-                    (*board[tempX + move[0]][tempY + move[1]]->getPieceType() == pieceType::KING && *board[tempX + move[0]][tempY + move[1]]->getPieceColor() == color))
+                if (futureColor == pieceColor::NONE ||
+                    (futureType == pieceType::KING && futureColor == kingColor))
                 {
                     tempXRayPath.push_back(std::vector<int>{tempX + move[0], tempY + move[1]});
                     tempX += move[0];
                     tempY += move[1];
                 }
                 // Else if the next move is an opposite color than the king and is equals the correct type
-                else if (*board[tempX + move[0]][tempY + move[1]]->getPieceColor() != color && *board[tempX + move[0]][tempY + move[1]]->getPieceType() == type)
+                else if (futureColor != kingColor && (futureType == pieceType::ROOK || futureType == pieceType::QUEEN || futureType == pieceType::BISHOP))
                 {
                     tempXRayPath.push_back(std::vector<int>{tempX + move[0], tempY + move[1]});
 
@@ -468,8 +478,19 @@ void ValidMoves::checkLinearMoves(Piece *board[8][8], std::vector<std::vector<in
     }
 }
 
-void ValidMoves::checkSingleMoves(Piece *board[8][8], std::vector<std::vector<int>> possibleMoves, int x, int y, int type, std::vector<std::vector<int>> &finalXRayPath)
+void ValidMoves::detectCheckFromSingularPieces(Piece *boardPtr[8][8], std::vector<std::vector<int>> possibleMoves, int kingX, int kingY, int kingColor, int type, std::vector<std::vector<int>> &checkMoves)
 {
+    for (std::vector<int> move : possibleMoves)
+    {
+        if (checkBoundary(kingX + move[0], kingY + move[1]))
+        {
+            // If the space is the opposite color of the king and is a pawn
+            if (*boardPtr[kingX + move[0]][kingY + move[1]]->getPieceColor() != kingColor && *boardPtr[kingX + move[0]][kingY + move[1]]->getPieceType() == type)
+            {
+                checkMoves.push_back(std::vector<int>{kingX + move[0], kingY + move[1]});
+            }
+        }
+    }
 }
 
 // For each rook, bishop, and queen of the opposite turns color, check if they pin any pieces
@@ -479,30 +500,44 @@ void ValidMoves::detectPinnedPieces(Piece *boardPtr[8][8], int color, int x, int
     {
         for (int col = 0; col < 8; col++)
         {
-            if (*boardPtr[row][col]->getPieceType() == pieceType::ROOK && *boardPtr[row][col]->getPieceColor() != color)
+            // If the piece color is opposite of the current turns color
+            if (*boardPtr[row][col]->getPieceColor() != color)
             {
-                std::vector<std::vector<int>> possibleRookMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-                linearPiecePin(boardPtr, possibleRookMoves, row, col, x, y);
+                if (*boardPtr[row][col]->getPieceType() == pieceType::ROOK)
+                {
+                    std::vector<std::vector<int>> possibleRookMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+                    linearPiecePin(boardPtr, possibleRookMoves, row, col, x, y);
+                }
+                else if (*boardPtr[row][col]->getPieceType() == pieceType::QUEEN)
+                {
+                    std::vector<std::vector<int>> possibleQueenMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+                    linearPiecePin(boardPtr, possibleQueenMoves, row, col, x, y);
+                }
+                else if (*boardPtr[row][col]->getPieceType() == pieceType::BISHOP)
+                {
+                    std::vector<std::vector<int>> possibleBishopMoves = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+                    linearPiecePin(boardPtr, possibleBishopMoves, row, col, x, y);
+                }
             }
         }
     }
 }
 
 // Cast a ray in all directions from the perspective of opposing rook, queen, and bishops
-void ValidMoves::linearPiecePin(Piece *boardPtr[8][8], std::vector<std::vector<int>> possibleMoves, int originalX, int originalY, int userClickX, int userClickY)
+void ValidMoves::linearPiecePin(Piece *boardPtr[8][8], std::vector<std::vector<int>> possibleMoves, int pinnerX, int pinnerY, int pinnedPieceX, int pinnedPieceY)
 {
     // Loop through each move in the possibleMoves list
     for (std::vector<int> move : possibleMoves)
     {
-        int tempX = originalX;
-        int tempY = originalY;
-        int originalColor = *boardPtr[originalX][originalY]->getPieceColor();
+        int tempX = pinnerX;
+        int tempY = pinnerY;
+        int originalColor = *boardPtr[pinnerX][pinnerY]->getPieceColor();
         bool continueSearching = true;
-        int pieceCount = 0;
+        int pieceCountBetweenPinnerAndKing = 0;
         int pinnedPieceX;
         int pinnedPieceY;
 
-        std::vector<std::vector<int>> pinnedPieceMoveList = {{originalX, originalY}};
+        std::vector<std::vector<int>> pinnedPieceMoveList = {{pinnerX, pinnerY}};
 
         // While continueSearching is true
         while (continueSearching)
@@ -514,7 +549,7 @@ void ValidMoves::linearPiecePin(Piece *boardPtr[8][8], std::vector<std::vector<i
                 // If the next move is an empty cell
                 if (*boardPtr[tempX + move[0]][tempY + move[1]]->getPieceColor() == pieceColor::NONE)
                 {
-                    if (pieceCount != 1)
+                    if (pieceCountBetweenPinnerAndKing != 1)
                     {
                         pinnedPieceMoveList.push_back(std::vector<int>{tempX + move[0], tempY + move[1]});
                     }
@@ -524,13 +559,15 @@ void ValidMoves::linearPiecePin(Piece *boardPtr[8][8], std::vector<std::vector<i
                 // Else if the move type is equal to a king
                 else if (*boardPtr[tempX + move[0]][tempY + move[1]]->getPieceType() == pieceType::KING)
                 {
-                    if (pieceCount == 1)
+                    // If theres only one piece between the pinner and the king, then that piece is pinned
+                    if (pieceCountBetweenPinnerAndKing == 1)
                     {
-                        std::vector<std::vector<int>> *validMoves = boardPtr[userClickX][userClickY]->getValidMoves();
+                        std::vector<std::vector<int>> *validMoves = boardPtr[pinnedPieceX][pinnedPieceY]->getValidMoves();
 
-                        if (pinnedPieceX == userClickX && pinnedPieceY == userClickY)
+                        // Compare the moves list between the cast from the pinner and the pieces valid moves
+                        if (pinnedPieceX == pinnedPieceX && pinnedPieceY == pinnedPieceY)
                         {
-                            compareTwoMovesLists(boardPtr, userClickX, userClickY, *validMoves, pinnedPieceMoveList);
+                            compareTwoMovesLists(boardPtr, pinnedPieceX, pinnedPieceY, *validMoves, pinnedPieceMoveList);
                         }
                     }
                     continueSearching = false;
@@ -543,14 +580,15 @@ void ValidMoves::linearPiecePin(Piece *boardPtr[8][8], std::vector<std::vector<i
                 // Else if the move color is not equal to the original piece color
                 else
                 {
-                    if (pieceCount == 0)
+                    // Save the position of the pinned piece
+                    if (pieceCountBetweenPinnerAndKing == 0)
                     {
                         pinnedPieceX = tempX + move[0];
                         pinnedPieceY = tempY + move[1];
                     }
                     tempX += move[0];
                     tempY += move[1];
-                    pieceCount += 1;
+                    pieceCountBetweenPinnerAndKing += 1;
                 }
             }
             else
