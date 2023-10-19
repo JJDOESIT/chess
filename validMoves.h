@@ -37,7 +37,8 @@ public:
     void isKingInCheck(Piece *boardPtr[8][8], int kingX, int kingY, int kingColor, std::vector<std::vector<int>> &checkMoves, bool &isInCheck);
     void detectCheckFromPawn(Piece *boardPtr[8][8], int kingX, int kingY, int kingColor, std::vector<std::vector<int>> &checkMoves);
     void detectCheckFromLinearPieces(Piece *board[8][8],
-                                     int kingX, int kingY, int kingColor,
+                                     std::vector<std::vector<int>> possibleMoves,
+                                     int kingX, int kingY, int kingColor, int type,
                                      std::vector<std::vector<int>> &finalXRayPath);
     void detectCheckFromSingularPieces(Piece *boardPtr[8][8], std::vector<std::vector<int>> possibleMoves, int kingX, int kingY, int kingColor, int type, std::vector<std::vector<int>> &checkMoves);
 

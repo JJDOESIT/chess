@@ -382,8 +382,11 @@ void ValidMoves::isKingInCheck(Piece *boardPtr[8][8], int kingX, int kingY, int 
     detectCheckFromPawn(boardPtr, kingX, kingY, kingColor, checkMoves);
 
     // Check if a king is in check by a rook, bishop, or queen
+    std::vector<std::vector<int>> possibleRookAndQueenMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    std::vector<std::vector<int>> possibleBishopAndQueenMoves = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
-    detectCheckFromLinearPieces(boardPtr, kingX, kingY, kingColor, checkMoves);
+    detectCheckFromLinearPieces(boardPtr, possibleRookAndQueenMoves, kingX, kingY, kingColor, pieceType::ROOK, checkMoves);
+    detectCheckFromLinearPieces(boardPtr, possibleBishopAndQueenMoves, kingX, kingY, kingColor, pieceType::BISHOP, checkMoves);
 
     std::vector<std::vector<int>> possibleKnightMoves = {{2, 1}, {2, -1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {1, -2}, {-1, -2}};
     std::vector<std::vector<int>> possibleKingMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
@@ -429,10 +432,9 @@ void ValidMoves::detectCheckFromPawn(Piece *boardPtr[8][8], int kingX, int kingY
     }
 }
 
-void ValidMoves::detectCheckFromLinearPieces(Piece *board[8][8], int kingX, int kingY, int kingColor, std::vector<std::vector<int>> &finalXRayPath)
+void ValidMoves::detectCheckFromLinearPieces(Piece *board[8][8], std::vector<std::vector<int>> possibleMoves, int kingX, int kingY, int kingColor, int type, std::vector<std::vector<int>> &finalXRayPath)
 {
-    std::vector<std::vector<int>> possibleLinearMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-    for (std::vector<int> move : possibleLinearMoves)
+    for (std::vector<int> move : possibleMoves)
     {
         int tempX = kingX;
         int tempY = kingY;
@@ -454,7 +456,7 @@ void ValidMoves::detectCheckFromLinearPieces(Piece *board[8][8], int kingX, int 
                     tempY += move[1];
                 }
                 // Else if the next move is an opposite color than the king and is equals the correct type
-                else if (futureColor != kingColor && (futureType == pieceType::ROOK || futureType == pieceType::QUEEN || futureType == pieceType::BISHOP))
+                else if (futureColor != kingColor && (futureType == type || futureType == pieceType::QUEEN))
                 {
                     tempXRayPath.push_back(std::vector<int>{tempX + move[0], tempY + move[1]});
 

@@ -3,12 +3,15 @@
 #include "validMoves.h"
 #include "globalEnum.h"
 #include "ai.h"
+#include "open.h"
 
 #ifndef INPUT
 #define INPUT
 class Input
 {
 private:
+    Open openingMoves;
+
 public:
     void whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board, ValidMoves *checkValidMoves, std::vector<std::vector<int>> *moves, AI *ai);
     void getPossibleMoves(sf::RenderWindow &window,

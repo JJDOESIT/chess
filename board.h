@@ -14,6 +14,7 @@ private:
     std::vector<sf::Texture> textureList;
     std::vector<int> positionOfLastMovedWhitePiece = {-1, -1};
     std::vector<int> positionOfLastMovedBlackPiece = {-1, -1};
+    std::vector<int> positionOfMostRecentMove = {-1, -1};
 
     struct moveData
     {
@@ -29,14 +30,13 @@ private:
         int overWrittenColor;
     } moveHistory;
 
-    int turn = playerTurn::WHITE;
-
-public:
-    int mode = playerMode::NONE;
     int swapBuffer[2];
 
-    bool inCheck = false;
+    int turn = playerTurn::WHITE;
 
+    int mode = playerMode::NONE;
+
+public:
     std::vector<std::vector<int>> checkMovesList;
 
     Piece *board[8][8] = {nullptr};
@@ -52,11 +52,13 @@ public:
     void erasePiece(Piece *boardPtr[8][8], int x, int y);
     void clearPiece(Piece *boardPtr[8][8], int x, int y);
 
-    void setpositionOfLastMovedWhitePiece(int x, int y);
+    void setPositionOfLastMovedWhitePiece(int x, int y);
     std::vector<int> *getpositionOfLastMovedWhitePiece();
 
-    void setpositionOfLastMovedBlackPiece(int x, int y);
+    void setPositionOfLastMovedBlackPiece(int x, int y);
     std::vector<int> *getpositionOfLastMovedBlackPiece();
+
+    void setPositionOfMostRecentPiece(int x, int y);
 
     int *getCurrentTurn();
     void switchTurn();
@@ -86,6 +88,7 @@ public:
     void drawPossibleMoves(sf::RenderWindow &window, std::vector<std::vector<int>> *moves);
 
     friend class Input;
+    friend class ValidMoves;
 };
 
 #endif

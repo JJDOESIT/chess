@@ -1,12 +1,14 @@
 #include "ai.h"
+#include "pieceMobilityMatrices.h"
 
 std::vector<int> AI::calculateBestMove(Board *board,
                                        Piece *boardCopy[8][8],
                                        ValidMoves *checkValidMoves,
                                        int depth,
-                                       int maximizingColor, int alpha, int beta)
+                                       int maximizingColor, int alpha, int beta, int &count)
 {
-
+    // std::cout << count << std::endl;
+    count += 1;
     // If the break case depth = 0 is reached
     if (depth == 0)
     {
@@ -32,18 +34,19 @@ std::vector<int> AI::calculateBestMove(Board *board,
     int minRank = 9999, maxRank = -9999;
     int rank;
 
+    bool check = false;
+    std::vector<std::vector<int>> checkMoves;
+
     // Loop through the board to find the kings position
     for (int row = 0; row < 8; row++)
     {
         for (int col = 0; col < 8; col++)
         {
             // If the piece is a king and its color matches the current current player
-            if (*board->board[row][col]->getPieceType() == pieceType::KING && *board->board[row][col]->getPieceColor() == board->turn)
+            if (*board->board[row][col]->getPieceType() == pieceType::KING && *board->board[row][col]->getPieceColor() == maximizingColor)
             {
                 // Check if the king is in check
-                checkValidMoves->isKingInCheck(board->board, row, col, board->turn, checkMoves, check);
-                // Get possible moves for the piece
-                getPossibleMoves(window, board, checkValidMoves, moves, checkMoves, check);
+                checkValidMoves->isKingInCheck(boardCopy, row, col, maximizingColor, checkMoves, check);
             }
         }
     }
@@ -56,11 +59,6 @@ std::vector<int> AI::calculateBestMove(Board *board,
             // If the piece color equals the maximizing color
             if (*boardCopy[row][col]->getPieceColor() == maximizingColor)
             {
-                // Check if the
-                bool check;
-                std::vector<std::vector<int>> checkMoves;
-                checkValidMoves->isKingInCheck(boardCopy, row, col, maximizingColor, checkMoves, check);
-
                 // Add the move to the valid moves list
                 checkValidMoves->getValidMoves(board, boardCopy, row, col, checkMoves, check, NULL, &allPossibleMoves);
             }
@@ -90,11 +88,11 @@ std::vector<int> AI::calculateBestMove(Board *board,
 
         if (maximizingColor == pieceColor::WHITE)
         {
-            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::BLACK, alpha, beta);
+            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::BLACK, alpha, beta, count);
         }
         else
         {
-            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::WHITE, alpha, beta);
+            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::WHITE, alpha, beta, count);
         }
 
         board->undoMove(boardCopy, startX, startY, endX, endY, startType, endType, startColor, endColor);
@@ -179,11 +177,11 @@ void AI::rankBoard(Piece *boardPtr[8][8], int maximizingColor, int &whiteScore, 
                 {
                 case pieceColor::WHITE:
                     whiteScore += 100;
-                    whitePawnMatrix(row, col, whiteScore);
+                    whiteScore += matrices::whitePawnMatrix[row][col];
                     break;
                 case pieceColor::BLACK:
                     blackScore += 100;
-                    blackPawnMatrix(row, col, blackScore);
+                    blackScore += matrices::blackPawnMatrix[row][col];
                     break;
                 }
                 break;
@@ -192,11 +190,11 @@ void AI::rankBoard(Piece *boardPtr[8][8], int maximizingColor, int &whiteScore, 
                 {
                 case pieceColor::WHITE:
                     whiteScore += 320;
-                    knightMatrix(row, col, whiteScore);
+                    whiteScore += matrices::knightMatrix[row][col];
                     break;
                 case pieceColor::BLACK:
                     blackScore += 320;
-                    knightMatrix(row, col, blackScore);
+                    blackScore += matrices::knightMatrix[row][col];
                     break;
                 }
                 break;
@@ -205,11 +203,11 @@ void AI::rankBoard(Piece *boardPtr[8][8], int maximizingColor, int &whiteScore, 
                 {
                 case pieceColor::WHITE:
                     whiteScore += 330;
-                    whiteBishopMatrix(row, col, whiteScore);
+                    whiteScore += matrices::whiteBishopMatrix[row][col];
                     break;
                 case pieceColor::BLACK:
                     blackScore += 330;
-                    blackBishopMatrix(row, col, blackScore);
+                    blackScore += matrices::blackBishopMatrix[row][col];
                     break;
                 }
                 break;
@@ -218,11 +216,11 @@ void AI::rankBoard(Piece *boardPtr[8][8], int maximizingColor, int &whiteScore, 
                 {
                 case pieceColor::WHITE:
                     whiteScore += 500;
-                    whiteRookMatrix(row, col, whiteScore);
+                    whiteScore += matrices::whiteRookMatrix[row][col];
                     break;
                 case pieceColor::BLACK:
                     blackScore += 500;
-                    blackRookMatrix(row, col, blackScore);
+                    blackScore += matrices::blackRookMatrix[row][col];
                     break;
                 }
                 break;
@@ -231,177 +229,15 @@ void AI::rankBoard(Piece *boardPtr[8][8], int maximizingColor, int &whiteScore, 
                 {
                 case pieceColor::WHITE:
                     whiteScore += 900;
-                    whiteQueenMatrix(row, col, whiteScore);
+                    whiteScore += matrices::whiteQueenMatrix[row][col];
                     break;
                 case pieceColor::BLACK:
                     blackScore += 900;
-                    blackQueenMatrix(row, col, blackScore);
+                    blackScore += matrices::blackQueenMatrix[row][col];
                     break;
                 }
                 break;
             }
         }
     }
-}
-
-// Influence white pawns moves
-void AI::whitePawnMatrix(int row, int col, int &score)
-{
-    int whitePawnMatrix[8][8] = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {5, 10, 10, -20, -20, 10, 10, 5},
-        {5, 0, -10, 0, 0, -10, 0, 5},
-        {0, 0, 0, 20, 20, 0, 0, 0},
-        {5, 5, 10, 25, 25, 10, 5, 5},
-        {10, 10, 20, 30, 30, 20, 10, 10},
-        {50, 50, 50, 50, 50, 50, 50, 50},
-        {0, 0, 0, 0, 0, 0, 0, 0}};
-
-    score += whitePawnMatrix[row][col];
-}
-
-// Influence black pawns moves
-void AI::blackPawnMatrix(int row, int col, int &score)
-{
-    int blackPawnMatrix[8][8] = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {50, 50, 50, 50, 50, 50, 50, 50},
-        {10, 10, 20, 30, 30, 20, 10, 10},
-        {5, 5, 10, 25, 25, 10, 5, 5},
-        {0, 0, 0, 20, 20, 0, 0, 0},
-        {5, 0, -10, 0, 0, -10, 0, 5},
-        {5, 10, 10, -20, -20, 10, 10, 5},
-        {0, 0, 0, 0, 0, 0, 0, 0}};
-
-    score += blackPawnMatrix[row][col];
-}
-
-// Influence knights moves
-void AI::knightMatrix(int row, int col, int &score)
-{
-    int knightMatrix[8][8] = {
-        {50, -40, -30, -30, -30, -30, -40, -50},
-        {-40, -20, 0, 0, 0, 0, -20, -40},
-        {-30, 0, 10, 15, 15, 10, 0, -30},
-        {-30, 5, 15, 20, 20, 15, 5, -30},
-        {-30, 0, 15, 20, 20, 15, 0, -30},
-        {-30, 5, 10, 15, 15, 10, 5, -30},
-        {-40, -20, 0, 5, 5, 0, -20, -40},
-        {-50, -40, -30, -30, -30, -30, -40, -50}};
-
-    score += knightMatrix[row][col];
-}
-
-// Influence white bishops moves
-void AI::whiteBishopMatrix(int row, int col, int &score)
-{
-    int whiteBishopMatrix[8][8] = {
-        {-20, -10, -10, -10, -10, -10, -10, -20},
-        {-10, 5, 0, 0, 0, 0, 5, -10},
-        {-10, 10, 10, 10, 10, 10, 10, -10},
-        {-10, 0, 10, 10, 10, 10, 0, -10},
-        {-10, 5, 5, 10, 10, 5, 5, -10},
-        {-10, 0, 5, 10, 10, 5, 0, -10},
-        {-10, 0, 0, 0, 0, 0, 0, -10},
-        {-20, -10, -10, -10, -10, -10, -10, -20},
-    };
-
-    score += whiteBishopMatrix[row][col];
-}
-
-// Influence black bishops moves
-void AI::blackBishopMatrix(int row, int col, int &score)
-{
-    int blackBishopMatrix[8][8] = {
-        {-20, -10, -10, -10, -10, -10, -10, -20},
-        {-10, 0, 0, 0, 0, 0, 0, -10},
-        {-10, 0, 5, 10, 10, 5, 0, -10},
-        {-10, 5, 5, 10, 10, 5, 5, -10},
-        {-10, 0, 10, 10, 10, 10, 0, -10},
-        {-10, 10, 10, 10, 10, 10, 10, -10},
-        {-10, 5, 0, 0, 0, 0, 5, -10},
-        {-20, -10, -10, -10, -10, -10, -10, -20},
-    };
-
-    score += blackBishopMatrix[row][col];
-}
-
-// Influence white rooks moves
-void AI::whiteRookMatrix(int row, int col, int &score)
-{
-    int whiteRookMatrix[8][8] = {
-        {0, 10, 0, 5, 5, 0, 10, 0},
-        {-5, 0, 0, 0, 0, 0, 0, -5},
-        {-5, 0, 0, 0, 0, 0, 0, -5},
-        {-5, 0, 0, 0, 0, 0, 0, -5},
-        {-5, 0, 0, 0, 0, 0, 0, -5},
-        {-5, 0, 0, 0, 0, 0, 0, -5},
-        {5, 10, 10, 10, 10, 10, 10, 5},
-        {0, 0, 0, 0, 0, 0, 0, 0}};
-
-    score += whiteRookMatrix[row][col];
-}
-
-// Influence black rooks moves
-void AI::blackRookMatrix(int row, int col, int &score)
-{
-    int blackRookMatrix[8][8] = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {5, 10, 10, 10, 10, 10, 10, 5},
-        {-5, 0, 0, 0, 0, 0, 0, -5},
-        {-5, 0, 0, 0, 0, 0, 0, -5},
-        {-5, 0, 0, 0, 0, 0, 0, -5},
-        {-5, 0, 0, 0, 0, 0, 0, -5},
-        {-5, 0, 0, 0, 0, 0, 0, -5},
-        {0, 10, 0, 5, 5, 0, 10, 0}};
-
-    score += blackRookMatrix[row][col];
-}
-
-// Influence white queens moves
-void AI::whiteQueenMatrix(int row, int col, int &score)
-{
-    int whiteQueenMatrix[8][8] = {
-        {-20, -10, -10, -5, -5, -10, -10, -20},
-        {-10, 0, 5, 0, 0, 0, 0, -10},
-        {-10, 5, 5, 5, 5, 5, 0, -10},
-        {0, 0, 5, 5, 5, 5, 0, -5},
-        {-5, 0, 5, 5, 5, 5, 0, -5},
-        {-10, 0, 5, 5, 5, 5, 0, -10},
-        {-10, 0, 0, 0, 0, 0, 0, -10},
-        {-20, -10, -10, -5, -5, -10, -10, -20}};
-
-    score += whiteQueenMatrix[row][col];
-}
-
-// Influence black queens moves
-void AI::blackQueenMatrix(int row, int col, int &score)
-{
-    int blackQueenMatrix[8][8] = {
-        {-20, -10, -10, -5, -5, -10, -10, -20},
-        {-10, 0, 0, 0, 0, 0, 0, -10},
-        {-10, 0, 5, 5, 5, 5, 0, -10},
-        {-5, 0, 5, 5, 5, 5, 0, -5},
-        {0, 0, 5, 5, 5, 5, 0, -5},
-        {-10, 5, 5, 5, 5, 5, 0, -10},
-        {-10, 0, 5, 0, 0, 0, 0, -10},
-        {-20, -10, -10, -5, -5, -10, -10, -20}};
-
-    score += blackQueenMatrix[row][col];
-}
-
-// Influence kings moves
-void AI::kingMatrix(int row, int col, int &score)
-{
-    int kingMatrix[8][8] = {
-        {3, 4, 2, 0, 0, 2, 4, 3},
-        {3, 3, 0, 0, 0, 0, 3, 3},
-        {-2, -3, -3, -3, -3, -3, -3, -2},
-        {-3, -4, -4, -4, -4, -4, -4, -3},
-        {-4, -5, -5, -6, -6, -5, -5, -4},
-        {-4, -5, -5, -6, -6, -5, -5, -4},
-        {-4, -5, -5, -6, -6, -5, -5, -4},
-        {-4, -5, -5, -6, -6, -5, -5, -4}};
-
-    score += kingMatrix[row][col];
 }

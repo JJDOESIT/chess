@@ -127,7 +127,7 @@ void Board::overwritePiece(int type, int color, int x, int y)
 }
 
 // Set the position of the last moved white piece
-void Board::setpositionOfLastMovedWhitePiece(int x, int y)
+void Board::setPositionOfLastMovedWhitePiece(int x, int y)
 {
     positionOfLastMovedWhitePiece[0] = x;
     positionOfLastMovedWhitePiece[1] = y;
@@ -140,7 +140,7 @@ std::vector<int> *Board::getpositionOfLastMovedWhitePiece()
 }
 
 // Set the position of the last moved black piece
-void Board::setpositionOfLastMovedBlackPiece(int x, int y)
+void Board::setPositionOfLastMovedBlackPiece(int x, int y)
 {
     positionOfLastMovedBlackPiece[0] = x;
     positionOfLastMovedBlackPiece[1] = y;
@@ -150,6 +150,13 @@ void Board::setpositionOfLastMovedBlackPiece(int x, int y)
 std::vector<int> *Board::getpositionOfLastMovedBlackPiece()
 {
     return &positionOfLastMovedBlackPiece;
+}
+
+// Set the position of the most recent piece moved
+void Board::setPositionOfMostRecentPiece(int x, int y)
+{
+    positionOfMostRecentMove[0] = x;
+    positionOfMostRecentMove[1] = y;
 }
 
 // Swap two pieces in the board
@@ -269,12 +276,13 @@ void Board::movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int
 
         if (*getCurrentTurn() == playerTurn::WHITE)
         {
-            setpositionOfLastMovedWhitePiece(overWrittenX, overWrittenY);
+            setPositionOfLastMovedWhitePiece(overWrittenX, overWrittenY);
         }
         else
         {
-            setpositionOfLastMovedBlackPiece(overWrittenX, overWrittenY);
+            setPositionOfLastMovedBlackPiece(overWrittenX, overWrittenY);
         }
+        setPositionOfMostRecentPiece(overWrittenX, overWrittenY);
     }
 }
 
@@ -371,6 +379,16 @@ void Board::drawSprites(sf::RenderWindow &window)
             }
         }
     }
+
+    // Draw
+    const int outlineThickness = 4;
+    sf::RectangleShape lastMovedPiece;
+    lastMovedPiece.setFillColor(sf::Color::Transparent);
+    lastMovedPiece.setSize(sf::Vector2f(68 - (outlineThickness * 2), 68 - (outlineThickness * 2)));
+    lastMovedPiece.setPosition(sf::Vector2f((positionOfMostRecentMove[1] * 68) + outlineThickness, (positionOfMostRecentMove[0] * 68) + outlineThickness));
+    lastMovedPiece.setOutlineThickness(outlineThickness);
+    lastMovedPiece.setOutlineColor(sf::Color(255, 215, 0, 255));
+    window.draw(lastMovedPiece);
 }
 
 // Draw background tiles
