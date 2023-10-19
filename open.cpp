@@ -6,6 +6,9 @@ bool Open::randomOpening(Board *board, Piece *boardPtr[8][8], int randomNumber)
     {
     case 0:
         return royLopez(board, boardPtr);
+        break;
+    default:
+        return false;
     }
 }
 
@@ -18,61 +21,45 @@ bool Open::royLopez(Board *board, Piece *boardPtr[8][8])
         return false;
     }
 
+    std::vector<std::vector<std::vector<int>>> openingMoves = {{{1, 4}, {3, 4}}, {{0, 6}, {2, 5}}, {{0, 5}, {4, 1}}};
+
     Piece *boardCopy[8][8];
-    std::vector<std::vector<int>> dummyMoves;
-    static std::vector<std::vector<int>> possibleThreatenedPieces;
-    bool pieceIsThreatened;
 
     board->copyArray(boardPtr, boardCopy);
 
-    switch (currentMove)
+    if (isMoveValid(board, boardCopy, currentMove, openingMoves))
     {
-    case 0:
-        board->movePiece(boardCopy, 1, 4, 3, 4, true);
-        possibleThreatenedPieces.push_back(std::vector<int>{3, 4});
-
-        for (auto move : possibleThreatenedPieces)
-        {
-            checkValidMoves.isKingInCheck(boardPtr, move[0], move[1], pieceColor::WHITE, dummyMoves, pieceIsThreatened);
-            if (pieceIsThreatened)
-            {
-                return false;
-            }
-        }
-
-        board->movePiece(boardPtr, 1, 4, 3, 4, false);
-        break;
-    case 1:
-        board->movePiece(boardCopy, 0, 6, 2, 5, true);
-        possibleThreatenedPieces.push_back(std::vector<int>{2, 5});
-
-        for (auto move : possibleThreatenedPieces)
-        {
-            checkValidMoves.isKingInCheck(boardPtr, move[0], move[1], pieceColor::WHITE, dummyMoves, pieceIsThreatened);
-            if (pieceIsThreatened)
-            {
-                return false;
-            }
-        }
-
-        board->movePiece(boardPtr, 0, 6, 2, 5, false);
-        break;
-    case 2:
-        board->movePiece(boardCopy, 0, 5, 4, 1, true);
-        possibleThreatenedPieces.push_back(std::vector<int>{4, 1});
-
-        for (auto move : possibleThreatenedPieces)
-        {
-            checkValidMoves.isKingInCheck(boardPtr, move[0], move[1], pieceColor::WHITE, dummyMoves, pieceIsThreatened);
-            if (pieceIsThreatened)
-            {
-                return false;
-            }
-        }
-
-        board->movePiece(boardPtr, 0, 5, 4, 1, false);
-        break;
+        board->movePiece(boardPtr,
+                         openingMoves[currentMove][0][0],
+                         openingMoves[currentMove][0][1],
+                         openingMoves[currentMove][1][0],
+                         openingMoves[currentMove][1][1], false);
+        currentMove++;
+        return true;
     }
-    currentMove++;
+    return false;
+}
+
+bool Open::isMoveValid(Board *board, Piece *boardPtr[8][8], int currentMove, std::vector<std::vector<std::vector<int>>> openingMoves)
+{
+    std::vector<std::vector<int>> dummyMoves;
+    bool pieceIsThreatened;
+
+    board->movePiece(boardPtr,
+                     openingMoves[currentMove][0][0],
+                     openingMoves[currentMove][0][1],
+                     openingMoves[currentMove][1][0],
+                     openingMoves[currentMove][1][1], false);
+
+    for (int i = 0; i <= currentMove; i++)
+    {
+        checkValidMoves.isKingInCheck(boardPtr,
+                                      openingMoves[i][1][0],
+                                      openingMoves[i][1][1], pieceColor::WHITE, dummyMoves, pieceIsThreatened);
+        if (pieceIsThreatened)
+        {
+            return false;
+        }
+    }
     return true;
 }

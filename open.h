@@ -11,6 +11,7 @@ private:
     ValidMoves checkValidMoves;
 
 public:
+    bool isMoveValid(Board *board, Piece *boardPtr[8][8], int currentMove, std::vector<std::vector<std::vector<int>>> openingMoves);
     bool randomOpening(Board *board, Piece *boardPtr[8][8], int randomNumber);
     bool royLopez(Board *board, Piece *boardPtr[8][8]);
 };
