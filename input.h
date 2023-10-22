@@ -14,7 +14,6 @@ class Input
 private:
     Open openingMoves;
     bool isOpening = true;
-
     int openingSet;
 
 public:

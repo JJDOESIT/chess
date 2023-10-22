@@ -249,6 +249,77 @@ void Board::checkForPassant(Piece *boardPtr[8][8], int x, int y, bool simulate)
     }
 }
 
+// Check if a pawn should be promoted
+void Board::checkPawnPromotion(Piece *boardPtr[8][8], int x, int y)
+{
+    if (*boardPtr[x][y]->getPieceColor() == pieceColor::WHITE)
+    {
+        if (x == 7)
+        {
+            promotePiece(boardPtr, x, y, pieceType::QUEEN);
+        }
+    }
+    else
+    {
+        if (x == 0)
+        {
+            promotePiece(boardPtr, x, y, pieceType::QUEEN);
+        }
+    }
+}
+
+// Promote a piece into the given type
+void Board::promotePiece(Piece *boardPtr[8][8], int x, int y, int type)
+{
+    boardPtr[x][y]->setPieceType(type);
+
+    int color = *boardPtr[x][y]->getPieceColor();
+
+    switch (type)
+    {
+    case (pieceType::ROOK):
+        if (color == pieceColor::WHITE)
+        {
+            boardPtr[x][y]->setTexture("./sprites/white_rook.png");
+        }
+        else
+        {
+            boardPtr[x][y]->setTexture("./sprites/black_rook.png");
+        }
+        break;
+    case (pieceType::BISHOP):
+        if (color == pieceColor::WHITE)
+        {
+            boardPtr[x][y]->setTexture("./sprites/white_bishop.png");
+        }
+        else
+        {
+            boardPtr[x][y]->setTexture("./sprites/black_bishop.png");
+        }
+        break;
+    case (pieceType::KNIGHT):
+        if (color == pieceColor::WHITE)
+        {
+            boardPtr[x][y]->setTexture("./sprites/white_knight.png");
+        }
+        else
+        {
+            boardPtr[x][y]->setTexture("./sprites/black_knight.png");
+        }
+        break;
+    case (pieceType::QUEEN):
+        if (color == pieceColor::WHITE)
+        {
+            boardPtr[x][y]->setTexture("./sprites/white_queen.png");
+        }
+        else
+        {
+            boardPtr[x][y]->setTexture("./sprites/black_queen.png");
+        }
+        break;
+    }
+}
+
 // Castle a king and rook
 void Board::castle(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, int &positionDifferential, bool simulate)
 {
@@ -281,6 +352,9 @@ void Board::castle(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int ov
 // Move piece
 void Board::movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate)
 {
+    // Increament the pieces total move count
+    boardPtr[overWriteX][overWriteY]->increamentMoveCounter();
+
     int yPositionDifferential = 0;
     bool isCastle;
 
@@ -298,14 +372,12 @@ void Board::movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int
     // Else if the square has another piece on it, destory the piece and deconstruct its data
     else
     {
-        isCastle = (*boardPtr[overWriteX][overWriteY]->getPieceType() == pieceType::KING &&
-                    *boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::ROOK &&
-                    *boardPtr[overWriteX][overWriteY]->getPieceColor() == *boardPtr[overWrittenX][overWrittenY]->getPieceColor());
         // If the current move is a castle, castle the king and the rook
-        if (isCastle)
+        if (*boardPtr[overWriteX][overWriteY]->getPieceType() == pieceType::KING &&
+            *boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::ROOK &&
+            *boardPtr[overWriteX][overWriteY]->getPieceColor() == *boardPtr[overWrittenX][overWrittenY]->getPieceColor())
         {
             boardPtr[overWrittenX][overWrittenY]->increamentMoveCounter();
-            boardPtr[overWriteX][overWriteY]->increamentMoveCounter();
             castle(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY, yPositionDifferential, simulate);
         }
         // Else take the piece normally
@@ -315,9 +387,10 @@ void Board::movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int
         }
     }
 
-    // Increase the times the piece has moved by 1
-    if (!isCastle)
-        boardPtr[overWrittenX][overWrittenY]->increamentMoveCounter();
+    if (*boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::PAWN)
+    {
+        checkPawnPromotion(boardPtr, overWrittenX, overWrittenY);
+    }
 
     // Set the position of the last moved piece to its corresponding color
     if (!simulate)
@@ -452,6 +525,7 @@ void Board::deleteArray(Piece *array[8][8])
 // Draw all sprites to the board
 void Board::drawSprites(sf::RenderWindow &window)
 {
+    isPieceMoving = false;
     for (int row = 0; row < 8; row++)
     {
         for (int col = 0; col < 8; col++)
@@ -460,21 +534,49 @@ void Board::drawSprites(sf::RenderWindow &window)
             {
                 sf::Sprite sprite = *board[row][col]->getSprite();
                 int *position = board[row][col]->getPiecePosition();
-                sprite.setPosition(sf::Vector2f(position[1] * global::squareSize, position[0] * global::squareSize));
+
+                float *positionBuffer = board[row][col]->getPiecePositionBuffer();
+
+                if (positionBuffer[0] - position[0] <= -0.001)
+                {
+                    positionBuffer[0] += 0.125;
+                    isPieceMoving = true;
+                }
+                else if (positionBuffer[0] - position[0] >= 0.001)
+                {
+                    positionBuffer[0] -= 0.125;
+                    isPieceMoving = true;
+                }
+                if (positionBuffer[1] - position[1] <= -0.001)
+                {
+                    positionBuffer[1] += 0.125;
+                    isPieceMoving = true;
+                }
+                else if (positionBuffer[1] - position[1] >= 0.001)
+                {
+                    positionBuffer[1] -= 0.125;
+                    isPieceMoving = true;
+                }
+
+                sprite.setPosition(sf::Vector2f(positionBuffer[1] * global::squareSize, positionBuffer[0] * global::squareSize));
                 window.draw(sprite);
             }
         }
     }
 
-    // Draw a border around the
-    const int outlineThickness = 4;
-    sf::RectangleShape lastMovedPiece;
-    lastMovedPiece.setFillColor(sf::Color::Transparent);
-    lastMovedPiece.setSize(sf::Vector2f(global::squareSize - (outlineThickness * 2), global::squareSize - (outlineThickness * 2)));
-    lastMovedPiece.setPosition(sf::Vector2f((positionOfMostRecentMove[1] * global::squareSize) + outlineThickness, (positionOfMostRecentMove[0] * global::squareSize) + outlineThickness));
-    lastMovedPiece.setOutlineThickness(outlineThickness);
-    lastMovedPiece.setOutlineColor(sf::Color(255, 215, 0, 255));
-    window.draw(lastMovedPiece);
+    // Draw a border around the most recently moved piece
+
+    if (!isPieceMoving)
+    {
+        const int outlineThickness = 4;
+        sf::RectangleShape lastMovedPiece;
+        lastMovedPiece.setFillColor(sf::Color::Transparent);
+        lastMovedPiece.setSize(sf::Vector2f(global::squareSize - (outlineThickness * 2), global::squareSize - (outlineThickness * 2)));
+        lastMovedPiece.setPosition(sf::Vector2f((positionOfMostRecentMove[1] * global::squareSize) + outlineThickness, (positionOfMostRecentMove[0] * global::squareSize) + outlineThickness));
+        lastMovedPiece.setOutlineThickness(outlineThickness);
+        lastMovedPiece.setOutlineColor(sf::Color(255, 215, 0, 255));
+        window.draw(lastMovedPiece);
+    }
 }
 
 // Draw background tiles

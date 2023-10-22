@@ -51,28 +51,31 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
     if (*board->getCurrentTurn() == playerTurn::WHITE)
     {
 
-        std::vector<int> matrixData = handleOpeningMove(board);
-
-        Piece *copyBoard[8][8];
-        board->copyArray(board->board, copyBoard);
-
-        std::vector<int> move = ai->calculateBestMove(board, board->board, checkValidMoves, global::depth, pieceColor::WHITE, -9999, 9999);
-        board->movePieceWithoutCheck(board->board, move[0], move[1], move[2], move[3]);
-        board->deleteArray(copyBoard);
-
-        if (isOpening)
+        /* if (!board->isPieceMoving)
         {
-            if (matrixData[4] != -1)
+            std::vector<int> matrixData = handleOpeningMove(board);
+
+            Piece *copyBoard[8][8];
+            board->copyArray(board->board, copyBoard);
+
+            std::vector<int> move = ai->calculateBestMove(board, board->board, checkValidMoves, global::depth, pieceColor::WHITE, -9999, 9999);
+            board->movePieceWithoutCheck(board->board, move[0], move[1], move[2], move[3]);
+            board->deleteArray(copyBoard);
+
+            if (isOpening)
             {
-                matrices::restoreMatrixData(matrixData[0], matrixData[1], matrixData[2], matrixData[3]);
+                if (matrixData[4] != -1)
+                {
+                    matrices::restoreMatrixData(matrixData[0], matrixData[1], matrixData[2], matrixData[3]);
+                }
+                if (matrixData[4] == 0)
+                {
+                    isOpening = false;
+                    global::changeDepth(4);
+                }
             }
-            if (matrixData[4] == 0)
-            {
-                isOpening = false;
-                global::changeDepth(4);
-            }
-        }
-        board->switchTurn();
+            board->switchTurn();
+        } */
     }
 }
 
@@ -136,7 +139,7 @@ std::vector<int> Input::handleOpeningMove(Board *board)
 
     if (!isOpeningSetInitilized)
     {
-        opening = randomInt(1, 2);
+        opening = randomInt(1, 4);
         isOpeningSetInitilized = true;
     }
 

@@ -1,6 +1,8 @@
 #include "board.h"
 #include "piece.h"
 #include "validMoves.h"
+#include <chrono>
+#include <thread>
 
 #ifndef OPEN
 #define OPEN
@@ -17,6 +19,8 @@ public:
 
     std::vector<int> royLopez(Board *board, Piece *boardPtr[8][8]);
     std::vector<int> italian(Board *board, Piece *boardPtr[8][8]);
+    std::vector<int> scotchGame(Board *board, Piece *boardPtr[8][8]);
+    std::vector<int> londonSystem(Board *board, Piece *boardPtr[8][8]);
 };
 
 #endif

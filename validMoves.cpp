@@ -237,12 +237,10 @@ void ValidMoves::getPawn(Board *board, Piece *boardPtr[8][8], int x, int y)
                             xDirection = 1;
                             xValue = 4;
                         }
+                        // Check if the attacking pawn is in the correct spot
                         if (x == xValue)
                         {
-                            if (*boardPtr[x + xDirection][y]->getPieceType() == pieceType::NONE)
-                            {
-                                boardPtr[x][y]->addMove(x + xDirection, y + futureY);
-                            }
+                            boardPtr[x][y]->addMove(x + xDirection, y + futureY);
                         }
                     }
                 }

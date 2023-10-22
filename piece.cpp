@@ -7,11 +7,13 @@ Piece::Piece(int type, int color, int x, int y, std::string fileName)
     pieceInfo.color = color;
     pieceInfo.position[0] = x;
     pieceInfo.position[1] = y;
+    pieceInfo.positionBuffer[0] = x;
+    pieceInfo.positionBuffer[1] = y;
 
     if (fileName != "")
     {
         pieceInfo.texture = new sf::Texture;
-        pieceInfo.texture->loadFromFile(fileName);
+        setTexture(fileName);
         pieceInfo.sprite.setTexture(*pieceInfo.texture);
     }
 }
@@ -53,6 +55,19 @@ void Piece::setPiecePosition(int x, int y)
     pieceInfo.position[1] = y;
 }
 
+// Return a pointer to piece position buffer
+float *Piece::getPiecePositionBuffer()
+{
+    return pieceInfo.positionBuffer;
+}
+
+// Set piece position buffer with given x and y values
+void Piece::setPiecePositionBuffer(int x, int y)
+{
+    pieceInfo.positionBuffer[0] = x;
+    pieceInfo.positionBuffer[1] = y;
+}
+
 // Return a pointer to the moveCounter
 int *Piece::getMoveCounter()
 {
@@ -77,20 +92,16 @@ std::vector<std::vector<int>> *Piece::getValidMoves()
     return &pieceInfo.validMoves;
 }
 
-void Piece::printValidMoves()
-{
-    std::cout << "Position: " << pieceInfo.position[0] << ", " << pieceInfo.position[1] << "| ";
-    for (auto move : pieceInfo.validMoves)
-    {
-        std::cout << "(" << move[0] << ", " << move[1] << ")"
-                  << ", ";
-    }
-}
-
 // Return a pointer to a sprite
 sf::Sprite *Piece::getSprite()
 {
     return &pieceInfo.sprite;
+}
+
+// Set a texture for the sprite
+void Piece::setTexture(std::string fileName)
+{
+    pieceInfo.texture->loadFromFile(fileName);
 }
 
 // Delete a texture off the heap

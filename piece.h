@@ -13,6 +13,7 @@ private:
         int type;
         int color;
         int position[2];
+        float positionBuffer[2];
         std::vector<std::vector<int>> validMoves;
         sf::Sprite sprite;
         sf::Texture *texture;
@@ -32,6 +33,9 @@ public:
     int *getPiecePosition();
     void setPiecePosition(int x, int y);
 
+    float *getPiecePositionBuffer();
+    void setPiecePositionBuffer(int x, int y);
+
     int *getMoveCounter();
     void increamentMoveCounter();
     void decreamentMoveCounter();
@@ -39,10 +43,9 @@ public:
     std::vector<std::vector<int>> *getValidMoves();
     void printValidMoves();
 
-    void setSprite(std::string fileName);
-
     sf::Sprite *getSprite();
 
+    void setTexture(std::string fileName);
     void deleteTexture();
 
     void addMove(int x, int y);

@@ -43,6 +43,8 @@ private:
     bool hasWhiteCastled = false;
     bool hasBlackCastled = false;
 
+    bool isPieceMoving = false;
+
 public:
     Piece *board[8][8] = {nullptr};
 
@@ -69,6 +71,9 @@ public:
     void switchTurn();
 
     void checkForPassant(Piece *boardPtr[8][8], int x, int y, bool simulate = false);
+
+    void checkPawnPromotion(Piece *boardPtr[8][8], int x, int y);
+    void promotePiece(Piece *boardPtr[8][8], int x, int y, int type);
 
     void castle(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, int &positionDifferential, bool simulat);
 
