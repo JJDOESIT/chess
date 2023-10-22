@@ -1,10 +1,9 @@
-
 #ifndef PIECEMOBILITYMATRICES
 #define PIECEMOBILITYMATRICES
 
 namespace matrices
 {
-    int whitePawnMatrix[8][8] = {
+    inline int whitePawnMatrix[8][8] = {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {5, 10, 10, -20, -20, 10, 10, 5},
         {5, 0, -10, 0, 0, -10, 0, 5},
@@ -14,7 +13,7 @@ namespace matrices
         {50, 50, 50, 50, 50, 50, 50, 50},
         {0, 0, 0, 0, 0, 0, 0, 0}};
 
-    int blackPawnMatrix[8][8] = {
+    inline int blackPawnMatrix[8][8] = {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {50, 50, 50, 50, 50, 50, 50, 50},
         {10, 10, 20, 30, 30, 20, 10, 10},
@@ -24,7 +23,7 @@ namespace matrices
         {5, 10, 10, -20, -20, 10, 10, 5},
         {0, 0, 0, 0, 0, 0, 0, 0}};
 
-    int knightMatrix[8][8] = {
+    inline int knightMatrix[8][8] = {
         {50, -40, -30, -30, -30, -30, -40, -50},
         {-40, -20, 0, 0, 0, 0, -20, -40},
         {-30, 0, 10, 15, 15, 10, 0, -30},
@@ -34,7 +33,7 @@ namespace matrices
         {-40, -20, 0, 5, 5, 0, -20, -40},
         {-50, -40, -30, -30, -30, -30, -40, -50}};
 
-    int whiteBishopMatrix[8][8] = {
+    inline int whiteBishopMatrix[8][8] = {
         {-20, -10, -10, -10, -10, -10, -10, -20},
         {-10, 5, 0, 0, 0, 0, 5, -10},
         {-10, 10, 10, 10, 10, 10, 10, -10},
@@ -45,7 +44,7 @@ namespace matrices
         {-20, -10, -10, -10, -10, -10, -10, -20},
     };
 
-    int blackBishopMatrix[8][8] = {
+    inline int blackBishopMatrix[8][8] = {
         {-20, -10, -10, -10, -10, -10, -10, -20},
         {-10, 0, 0, 0, 0, 0, 0, -10},
         {-10, 0, 5, 10, 10, 5, 0, -10},
@@ -56,8 +55,8 @@ namespace matrices
         {-20, -10, -10, -10, -10, -10, -10, -20},
     };
 
-    int whiteRookMatrix[8][8] = {
-        {0, 10, 0, 5, 5, 0, 10, 0},
+    inline int whiteRookMatrix[8][8] = {
+        {0, 10, 0, 10, 5, 10, 0, 0},
         {-5, 0, 0, 0, 0, 0, 0, -5},
         {-5, 0, 0, 0, 0, 0, 0, -5},
         {-5, 0, 0, 0, 0, 0, 0, -5},
@@ -66,7 +65,7 @@ namespace matrices
         {5, 10, 10, 10, 10, 10, 10, 5},
         {0, 0, 0, 0, 0, 0, 0, 0}};
 
-    int blackRookMatrix[8][8] = {
+    inline int blackRookMatrix[8][8] = {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {5, 10, 10, 10, 10, 10, 10, 5},
         {-5, 0, 0, 0, 0, 0, 0, -5},
@@ -74,9 +73,9 @@ namespace matrices
         {-5, 0, 0, 0, 0, 0, 0, -5},
         {-5, 0, 0, 0, 0, 0, 0, -5},
         {-5, 0, 0, 0, 0, 0, 0, -5},
-        {0, 10, 0, 5, 5, 0, 10, 0}};
+        {0, 10, 0, 10, 5, 10, 0, 0}};
 
-    int whiteQueenMatrix[8][8] = {
+    inline int whiteQueenMatrix[8][8] = {
         {-20, -10, -10, -5, -5, -10, -10, -20},
         {-10, 0, 5, 0, 0, 0, 0, -10},
         {-10, 5, 5, 5, 5, 5, 0, -10},
@@ -86,7 +85,7 @@ namespace matrices
         {-10, 0, 0, 0, 0, 0, 0, -10},
         {-20, -10, -10, -5, -5, -10, -10, -20}};
 
-    int blackQueenMatrix[8][8] = {
+    inline int blackQueenMatrix[8][8] = {
         {-20, -10, -10, -5, -5, -10, -10, -20},
         {-10, 0, 0, 0, 0, 0, 0, -10},
         {-10, 0, 5, 5, 5, 5, 0, -10},
@@ -96,15 +95,50 @@ namespace matrices
         {-10, 0, 5, 0, 0, 0, 0, -10},
         {-20, -10, -10, -5, -5, -10, -10, -20}};
 
-    int kingMatrix[8][8] = {
-        {3, 4, 2, 0, 0, 2, 4, 3},
-        {3, 3, 0, 0, 0, 0, 3, 3},
-        {-2, -3, -3, -3, -3, -3, -3, -2},
-        {-3, -4, -4, -4, -4, -4, -4, -3},
-        {-4, -5, -5, -6, -6, -5, -5, -4},
-        {-4, -5, -5, -6, -6, -5, -5, -4},
-        {-4, -5, -5, -6, -6, -5, -5, -4},
-        {-4, -5, -5, -6, -6, -5, -5, -4}};
+    inline int whiteKingMatrix[8][8] = {
+        {20, 10, 30, 0, 0, 10, 30, 20},
+        {20, 20, 0, 0, 0, 0, 20, 20},
+        {-10, -20, -20, -20, -20, -20, -20, -10},
+        {-20, -30, -30, -40, -40, -30, -30, -20},
+        {-30, -40, -40, -50, -50, -40, -40, -30},
+        {-30, -40, -40, -50, -50, -40, -40, -30},
+        {-30, -40, -40, -50, -50, -40, -40, -30},
+        {-30, -40, -40, -50, -50, -40, -40, -30}};
+
+    inline int blackKingMatrix[8][8] = {
+        {-30, -40, -40, -50, -50, -40, -40, -30},
+        {-30, -40, -40, -50, -50, -40, -40, -30},
+        {-30, -40, -40, -50, -50, -40, -40, -30},
+        {-30, -40, -40, -50, -50, -40, -40, -30},
+        {-20, -30, -30, -40, -40, -30, -30, -20},
+        {-10, -20, -20, -20, -20, -20, -20, -10},
+        {20, 20, 0, 0, 0, 0, 20, 20},
+        {20, 10, 30, 0, 0, 10, 30, 20}};
+
+    inline void restoreMatrixData(int type, int row, int col, int value)
+    {
+        switch (type)
+        {
+        case (pieceType::PAWN):
+            whitePawnMatrix[row][col] = value;
+            break;
+        case (pieceType::ROOK):
+            whiteRookMatrix[row][col] = value;
+            break;
+        case (pieceType::BISHOP):
+            whiteBishopMatrix[row][col] = value;
+            break;
+        case (pieceType::KNIGHT):
+            knightMatrix[row][col] = value;
+            break;
+        case (pieceType::QUEEN):
+            whiteQueenMatrix[row][col] = value;
+            break;
+        case (pieceType::KING):
+            whiteKingMatrix[row][col] = value;
+            break;
+        }
+    }
 
 }
 

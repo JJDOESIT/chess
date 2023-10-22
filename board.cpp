@@ -1,4 +1,5 @@
 #include "board.h"
+#include "globalValues.h"
 
 void Board::initPieceList()
 {
@@ -230,16 +231,49 @@ void Board::checkForPassant(Piece *boardPtr[8][8], int x, int y, bool simulate)
                 clearPiece(boardPtr, x + 1, y);
             }
         }
+        // If the attacking pawn is white
         else if (*boardPtr[x][y]->getPieceColor() == pieceColor::WHITE)
         {
+            // If the piece right below the pawn is another pawn
             if (*boardPtr[x - 1][y]->getPieceType() == pieceType::PAWN)
             {
                 if (!simulate)
                 {
+                    // Clear piece and its data
                     erasePiece(boardPtr, x - 1, y);
                 }
+                // Set the pawn to an empty cell
                 clearPiece(boardPtr, x - 1, y);
             }
+        }
+    }
+}
+
+// Castle a king and rook
+void Board::castle(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, int &positionDifferential, bool simulate)
+{
+    if (overWrittenY == 0)
+    {
+        swapPieces(boardPtr, overWriteX, overWriteY, overWriteX, overWriteY - 2);
+        swapPieces(boardPtr, overWrittenX, overWrittenY, overWrittenX, overWrittenY + 3);
+        positionDifferential = 2;
+    }
+    else if (overWrittenY == 7)
+    {
+        swapPieces(boardPtr, overWriteX, overWriteY, overWriteX, overWriteY + 2);
+        swapPieces(boardPtr, overWrittenX, overWrittenY, overWrittenX, overWrittenY - 2);
+        positionDifferential = -1;
+    }
+
+    if (!simulate)
+    {
+        if (turn == playerTurn::WHITE)
+        {
+            hasWhiteCastled = true;
+        }
+        else
+        {
+            hasBlackCastled = true;
         }
     }
 }
@@ -247,42 +281,57 @@ void Board::checkForPassant(Piece *boardPtr[8][8], int x, int y, bool simulate)
 // Move piece
 void Board::movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate)
 {
+    int yPositionDifferential = 0;
+    bool isCastle;
 
     // If the square a piece is moving too is empty, swap the two pointers
     if (*boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::NONE)
     {
-
         swapPieces(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY);
-        // checkForPassant(boardPtr, overWrittenX, overWrittenY, simulate);
+
+        // If the attacking piece is a pawn, check if the attack was a passant move
+        if (*boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::PAWN)
+        {
+            checkForPassant(boardPtr, overWrittenX, overWrittenY, simulate);
+        }
     }
     // Else if the square has another piece on it, destory the piece and deconstruct its data
     else
     {
-
-        takePiece(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY, simulate);
+        isCastle = (*boardPtr[overWriteX][overWriteY]->getPieceType() == pieceType::KING &&
+                    *boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::ROOK &&
+                    *boardPtr[overWriteX][overWriteY]->getPieceColor() == *boardPtr[overWrittenX][overWrittenY]->getPieceColor());
+        // If the current move is a castle, castle the king and the rook
+        if (isCastle)
+        {
+            boardPtr[overWrittenX][overWrittenY]->increamentMoveCounter();
+            boardPtr[overWriteX][overWriteY]->increamentMoveCounter();
+            castle(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY, yPositionDifferential, simulate);
+        }
+        // Else take the piece normally
+        else
+        {
+            takePiece(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY, simulate);
+        }
     }
+
+    // Increase the times the piece has moved by 1
+    if (!isCastle)
+        boardPtr[overWrittenX][overWrittenY]->increamentMoveCounter();
 
     // Set the position of the last moved piece to its corresponding color
     if (!simulate)
     {
-        // Set hasMoved to be true
-        if (!*boardPtr[overWrittenX][overWriteY]->getHasMoved())
-        {
-            boardPtr[overWrittenX][overWrittenY]->setHasMoved();
-        }
-
-        // Increase the times the piece has moved by 1
-        boardPtr[overWrittenX][overWrittenY]->increamentMoveCounter();
-
         if (*getCurrentTurn() == playerTurn::WHITE)
         {
+            totalWhiteMoveCount += 1;
             setPositionOfLastMovedWhitePiece(overWrittenX, overWrittenY);
         }
         else
         {
             setPositionOfLastMovedBlackPiece(overWrittenX, overWrittenY);
         }
-        setPositionOfMostRecentPiece(overWrittenX, overWrittenY);
+        setPositionOfMostRecentPiece(overWrittenX, overWrittenY + yPositionDifferential);
     }
 }
 
@@ -323,19 +372,56 @@ void Board::undoMove(Piece *boardPtr[8][8], int positionOfOverWriteX,
                      int positionOfOverWrittenY, int overWriteType,
                      int overWrittenType,
                      int overWriteColor,
-                     int overWrittenColor)
+                     int overWrittenColor,
+                     bool isPassant,
+                     bool isCastle)
 {
-    swapPieces(boardPtr,
-               positionOfOverWriteX,
-               positionOfOverWriteY,
-               positionOfOverWrittenX,
-               positionOfOverWrittenY);
 
-    board[positionOfOverWriteX][positionOfOverWriteY]->setPieceType(overWriteType);
-    board[positionOfOverWriteX][positionOfOverWriteY]->setPieceColor(overWriteColor);
+    if (!isCastle)
+    {
+        // Swap the two pieces back
+        swapPieces(boardPtr,
+                   positionOfOverWriteX,
+                   positionOfOverWriteY,
+                   positionOfOverWrittenX,
+                   positionOfOverWrittenY);
 
-    board[positionOfOverWrittenX][positionOfOverWrittenY]->setPieceType(overWrittenType);
-    board[positionOfOverWrittenX][positionOfOverWrittenY]->setPieceColor(overWrittenColor);
+        // Restore the original data types of the pieces
+        board[positionOfOverWriteX][positionOfOverWriteY]->setPieceType(overWriteType);
+        board[positionOfOverWriteX][positionOfOverWriteY]->setPieceColor(overWriteColor);
+
+        board[positionOfOverWrittenX][positionOfOverWrittenY]->setPieceType(overWrittenType);
+        board[positionOfOverWrittenX][positionOfOverWrittenY]->setPieceColor(overWrittenColor);
+
+        board[positionOfOverWriteX][positionOfOverWriteY]->decreamentMoveCounter();
+    }
+
+    else
+    {
+        if (positionOfOverWrittenY == 0)
+        {
+            swapPieces(boardPtr, positionOfOverWriteX, positionOfOverWriteY, positionOfOverWriteX, positionOfOverWriteY - 2);
+            swapPieces(boardPtr, positionOfOverWrittenX, positionOfOverWrittenY, positionOfOverWrittenX, positionOfOverWrittenY + 3);
+        }
+        else if (positionOfOverWrittenY == 7)
+        {
+            swapPieces(boardPtr, positionOfOverWriteX, positionOfOverWriteY, positionOfOverWriteX, positionOfOverWriteY + 2);
+            swapPieces(boardPtr, positionOfOverWrittenX, positionOfOverWrittenY, positionOfOverWrittenX, positionOfOverWrittenY - 2);
+        }
+        board[positionOfOverWriteX][positionOfOverWriteY]->decreamentMoveCounter();
+        board[positionOfOverWrittenX][positionOfOverWrittenY]->decreamentMoveCounter();
+    }
+
+    // Used in the undo move section of the AI. If it sees that the AI did an En Passant Capture, then it will
+    // not only undo the swapping of the two pieces, but restore the captured pawn
+    if (isPassant)
+    {
+        if (overWriteColor == pieceColor::WHITE)
+        {
+            boardPtr[positionOfOverWrittenX - 1][positionOfOverWrittenY]->setPieceColor(pieceColor::BLACK);
+            boardPtr[positionOfOverWrittenX - 1][positionOfOverWrittenY]->setPieceType(pieceType::PAWN);
+        }
+    }
 }
 
 // Copy data from one board to another
@@ -374,18 +460,18 @@ void Board::drawSprites(sf::RenderWindow &window)
             {
                 sf::Sprite sprite = *board[row][col]->getSprite();
                 int *position = board[row][col]->getPiecePosition();
-                sprite.setPosition(sf::Vector2f(position[1] * 68, position[0] * 68));
+                sprite.setPosition(sf::Vector2f(position[1] * global::squareSize, position[0] * global::squareSize));
                 window.draw(sprite);
             }
         }
     }
 
-    // Draw
+    // Draw a border around the
     const int outlineThickness = 4;
     sf::RectangleShape lastMovedPiece;
     lastMovedPiece.setFillColor(sf::Color::Transparent);
-    lastMovedPiece.setSize(sf::Vector2f(68 - (outlineThickness * 2), 68 - (outlineThickness * 2)));
-    lastMovedPiece.setPosition(sf::Vector2f((positionOfMostRecentMove[1] * 68) + outlineThickness, (positionOfMostRecentMove[0] * 68) + outlineThickness));
+    lastMovedPiece.setSize(sf::Vector2f(global::squareSize - (outlineThickness * 2), global::squareSize - (outlineThickness * 2)));
+    lastMovedPiece.setPosition(sf::Vector2f((positionOfMostRecentMove[1] * global::squareSize) + outlineThickness, (positionOfMostRecentMove[0] * global::squareSize) + outlineThickness));
     lastMovedPiece.setOutlineThickness(outlineThickness);
     lastMovedPiece.setOutlineColor(sf::Color(255, 215, 0, 255));
     window.draw(lastMovedPiece);
@@ -399,8 +485,8 @@ void Board::drawBoard(sf::RenderWindow &window)
         for (int col = 0; col < 8; col++)
         {
             sf::RectangleShape rect;
-            rect.setSize(sf::Vector2f(68, 68));
-            rect.setPosition(sf::Vector2f(row * 68, col * 68));
+            rect.setSize(sf::Vector2f(global::squareSize, global::squareSize));
+            rect.setPosition(sf::Vector2f(row * global::squareSize, col * global::squareSize));
             if ((row + col) % 2 == 0)
             {
                 rect.setFillColor(sf::Color(238, 214, 176));
@@ -421,8 +507,8 @@ void Board::drawPossibleMoves(sf::RenderWindow &window, std::vector<std::vector<
     for (std::vector<int> i : *moves)
     {
         sf::RectangleShape possibleMove;
-        possibleMove.setSize(sf::Vector2f(68, 68));
-        possibleMove.setPosition(i[1] * 68, i[0] * 68);
+        possibleMove.setSize(sf::Vector2f(global::squareSize, global::squareSize));
+        possibleMove.setPosition(i[1] * global::squareSize, i[0] * global::squareSize);
         possibleMove.setFillColor(sf::Color(255, 150, 150, 100));
         window.draw(possibleMove);
     }

@@ -6,7 +6,6 @@
 #include <iostream>
 #include "ai.h"
 #include <SFML/Graphics.hpp>
-#include <map>
 
 int main()
 {

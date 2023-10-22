@@ -1,14 +1,13 @@
 #include "ai.h"
 #include "pieceMobilityMatrices.h"
+#include "globalValues.h"
 
 std::vector<int> AI::calculateBestMove(Board *board,
                                        Piece *boardCopy[8][8],
                                        ValidMoves *checkValidMoves,
                                        int depth,
-                                       int maximizingColor, int alpha, int beta, int &count)
+                                       int maximizingColor, int alpha, int beta)
 {
-    // std::cout << count << std::endl;
-    count += 1;
     // If the break case depth = 0 is reached
     if (depth == 0)
     {
@@ -71,6 +70,7 @@ std::vector<int> AI::calculateBestMove(Board *board,
     int bestMoveStartXPosition = -1;
     int bestMoveStartYPosition = -1;
 
+    // Loop through every single move each piece can make
     for (auto move : allPossibleMoves)
     {
         int startX = move[0][0];
@@ -84,24 +84,34 @@ std::vector<int> AI::calculateBestMove(Board *board,
         int startColor = *boardCopy[startX][startY]->getPieceColor();
         int endColor = *boardCopy[endX][endY]->getPieceColor();
 
+        // Check if the possible move is a passant capture
+        bool passant = checkValidMoves->isThisMoveEnPassant(boardCopy, startX, startY, endX, endY);
+
+        // Check if the possible is a castle
+        bool castle = (startType == pieceType::KING && endType == pieceType::ROOK && startColor == endColor);
+
+        // Move the piece
         board->movePiece(boardCopy, startX, startY, endX, endY, true);
 
+        // Recursive call switching to the opposite color
         if (maximizingColor == pieceColor::WHITE)
         {
-            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::BLACK, alpha, beta, count);
+            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::BLACK, alpha, beta);
         }
         else
         {
-            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::WHITE, alpha, beta, count);
+            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::WHITE, alpha, beta);
         }
 
-        board->undoMove(boardCopy, startX, startY, endX, endY, startType, endType, startColor, endColor);
+        // Undo the move
+        board->undoMove(boardCopy, startX, startY, endX, endY, startType, endType, startColor, endColor, passant, castle);
 
+        // If the current turn is white
         if (maximizingColor == pieceColor::WHITE)
         {
-
             rank = moveData[4];
 
+            // Find the highest rank of all the board states
             if (rank >= maxRank)
             {
                 bestMoveEndPositionX = endX;
@@ -116,10 +126,12 @@ std::vector<int> AI::calculateBestMove(Board *board,
             }
         }
 
+        // If the current turn is black
         else
         {
             rank = moveData[4];
 
+            // Find the lowest rank of all the board states
             if (rank <= minRank)
             {
                 bestMoveEndPositionX = endX;
@@ -170,17 +182,18 @@ void AI::rankBoard(Piece *boardPtr[8][8], int maximizingColor, int &whiteScore, 
         {
             int type = *boardPtr[row][col]->getPieceType();
             int color = *boardPtr[row][col]->getPieceColor();
+
             switch (type)
             {
             case pieceType::PAWN:
                 switch (color)
                 {
                 case pieceColor::WHITE:
-                    whiteScore += 100;
+                    whiteScore += global::pawnValue;
                     whiteScore += matrices::whitePawnMatrix[row][col];
                     break;
                 case pieceColor::BLACK:
-                    blackScore += 100;
+                    blackScore += global::pawnValue;
                     blackScore += matrices::blackPawnMatrix[row][col];
                     break;
                 }
@@ -189,11 +202,11 @@ void AI::rankBoard(Piece *boardPtr[8][8], int maximizingColor, int &whiteScore, 
                 switch (color)
                 {
                 case pieceColor::WHITE:
-                    whiteScore += 320;
+                    whiteScore += global::knightValue;
                     whiteScore += matrices::knightMatrix[row][col];
                     break;
                 case pieceColor::BLACK:
-                    blackScore += 320;
+                    blackScore += global::knightValue;
                     blackScore += matrices::knightMatrix[row][col];
                     break;
                 }
@@ -202,11 +215,11 @@ void AI::rankBoard(Piece *boardPtr[8][8], int maximizingColor, int &whiteScore, 
                 switch (color)
                 {
                 case pieceColor::WHITE:
-                    whiteScore += 330;
+                    whiteScore += global::bishopValue;
                     whiteScore += matrices::whiteBishopMatrix[row][col];
                     break;
                 case pieceColor::BLACK:
-                    blackScore += 330;
+                    blackScore += global::bishopValue;
                     blackScore += matrices::blackBishopMatrix[row][col];
                     break;
                 }
@@ -215,11 +228,11 @@ void AI::rankBoard(Piece *boardPtr[8][8], int maximizingColor, int &whiteScore, 
                 switch (color)
                 {
                 case pieceColor::WHITE:
-                    whiteScore += 500;
+                    whiteScore += global::rookValue;
                     whiteScore += matrices::whiteRookMatrix[row][col];
                     break;
                 case pieceColor::BLACK:
-                    blackScore += 500;
+                    blackScore += global::rookValue;
                     blackScore += matrices::blackRookMatrix[row][col];
                     break;
                 }
@@ -228,12 +241,24 @@ void AI::rankBoard(Piece *boardPtr[8][8], int maximizingColor, int &whiteScore, 
                 switch (color)
                 {
                 case pieceColor::WHITE:
-                    whiteScore += 900;
+                    whiteScore += global::queenValue;
                     whiteScore += matrices::whiteQueenMatrix[row][col];
                     break;
                 case pieceColor::BLACK:
-                    blackScore += 900;
+                    blackScore += global::queenValue;
                     blackScore += matrices::blackQueenMatrix[row][col];
+                    break;
+                }
+                break;
+
+            case pieceType::KING:
+                switch (color)
+                {
+                case pieceColor::WHITE:
+                    whiteScore += matrices::whiteKingMatrix[row][col];
+                    break;
+                case pieceColor::BLACK:
+                    blackScore += matrices::blackKingMatrix[row][col];
                     break;
                 }
                 break;

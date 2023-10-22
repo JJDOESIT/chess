@@ -9,11 +9,14 @@ class Open
 {
 private:
     ValidMoves checkValidMoves;
+    const int skewValue = 90;
 
 public:
-    bool isMoveValid(Board *board, Piece *boardPtr[8][8], int currentMove, std::vector<std::vector<std::vector<int>>> openingMoves);
-    bool randomOpening(Board *board, Piece *boardPtr[8][8], int randomNumber);
-    bool royLopez(Board *board, Piece *boardPtr[8][8]);
+    std::vector<int> randomOpening(Board *board, Piece *boardPtr[8][8], int randomNumber);
+    void addMove(int pieceType, int row, int col, int value, bool continueOpening, std::vector<int> &matrixData);
+
+    std::vector<int> royLopez(Board *board, Piece *boardPtr[8][8]);
+    std::vector<int> italian(Board *board, Piece *boardPtr[8][8]);
 };
 
 #endif

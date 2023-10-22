@@ -16,7 +16,6 @@ private:
         std::vector<std::vector<int>> validMoves;
         sf::Sprite sprite;
         sf::Texture *texture;
-        bool hasMoved = false;
         int moveCounter = 0;
     };
 
@@ -33,11 +32,9 @@ public:
     int *getPiecePosition();
     void setPiecePosition(int x, int y);
 
-    bool *getHasMoved();
-    void setHasMoved();
-
     int *getMoveCounter();
     void increamentMoveCounter();
+    void decreamentMoveCounter();
 
     std::vector<std::vector<int>> *getValidMoves();
     void printValidMoves();

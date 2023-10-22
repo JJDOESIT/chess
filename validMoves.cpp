@@ -28,6 +28,7 @@ void ValidMoves::getValidMoves(Board *board,
         break;
     case (pieceType::KING):
         getKing(boardPtr, x, y);
+        checkCastle(board, boardPtr, x, y);
         break;
     case (pieceType::QUEEN):
         getQueen(board, boardPtr, x, y);
@@ -140,7 +141,7 @@ void ValidMoves::getPawn(Board *board, Piece *boardPtr[8][8], int x, int y)
         possibleMoves = {{-1, 0}, {-1, -1}, {-1, 1}};
 
         // Check to see if the pawn can move two spaces
-        if (!*boardPtr[x][y]->getHasMoved())
+        if (*boardPtr[x][y]->getMoveCounter() == 0)
         {
             if (*boardPtr[x - 1][y]->getPieceType() == pieceType::NONE && *boardPtr[x - 1][y]->getPieceType() != pieceType::KING)
             {
@@ -155,7 +156,7 @@ void ValidMoves::getPawn(Board *board, Piece *boardPtr[8][8], int x, int y)
         possibleMoves = {{1, 0}, {1, -1}, {1, 1}};
 
         // Check to see if the pawn can move two space
-        if (!*boardPtr[x][y]->getHasMoved())
+        if (*boardPtr[x][y]->getMoveCounter() == 0)
         {
             if (*boardPtr[x + 1][y]->getPieceType() == pieceType::NONE && *boardPtr[x + 1][y]->getPieceType() != pieceType::KING)
             {
@@ -310,6 +311,117 @@ void ValidMoves::getQueen(Board *board, Piece *boardPtr[8][8], int x, int y)
 {
     std::vector<std::vector<int>> possibleMoves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
     calculateLinearMoves(board, boardPtr, possibleMoves, x, y);
+}
+
+// Check if the move just played was a passant capture
+bool ValidMoves::isThisMoveEnPassant(Piece *boardPtr[8][8], int startX, int startY, int endX, int endY)
+{
+    int startColor = *boardPtr[startX][startY]->getPieceColor();
+    int startType = *boardPtr[startX][startY]->getPieceType();
+
+    int endColor = *boardPtr[endX][endY]->getPieceColor();
+    int endType = *boardPtr[endX][endY]->getPieceType();
+
+    if (startType == pieceType::PAWN)
+    {
+        if (endType == pieceType::NONE)
+        {
+            if (startY != endY)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
+// Check if a king can castle
+void ValidMoves::checkCastle(Board *board, Piece *boardPtr[8][8], int x, int y)
+{
+    bool continueSearch = false;
+    int kingColor = *boardPtr[x][y]->getPieceColor();
+
+    if (kingColor == pieceColor::WHITE)
+    {
+        if (!board->hasWhiteCastled)
+        {
+            continueSearch = true;
+        }
+    }
+    else if (!board->hasBlackCastled)
+    {
+        continueSearch = true;
+    }
+
+    if (continueSearch)
+    {
+        bool check;
+        std::vector<std::vector<int>> dummyMoves;
+        if (*boardPtr[x][y]->getMoveCounter() == 0)
+        {
+            // Check if king can castle with right rook
+            if (*boardPtr[x][y + 1]->getPieceType() == pieceType::NONE)
+            {
+                // Check if the king would pass through check
+                isKingInCheck(boardPtr, x, y + 1, kingColor, dummyMoves, check);
+                if (!check)
+                {
+                    // Check if the square is empty
+                    if (*boardPtr[x][y + 2]->getPieceType() == pieceType::NONE)
+                    {
+                        // Check if the king would pass through check
+                        isKingInCheck(boardPtr, x, y + 2, kingColor, dummyMoves, check);
+                        if (!check)
+                        {
+                            // Check if the corner square is a rook and that it hasn't moved
+                            if (*boardPtr[x][y + 3]->getPieceType() == pieceType::ROOK)
+                            {
+                                if (*boardPtr[x][y + 3]->getMoveCounter() == 0)
+                                {
+                                    boardPtr[x][y]->addMove(x, y + 3);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // Check if king can castle with left rook
+            if (*boardPtr[x][y - 1]->getPieceType() == pieceType::NONE)
+            {
+                // Check if the king would pass through check
+                isKingInCheck(boardPtr, x, y - 1, kingColor, dummyMoves, check);
+                if (!check)
+                {
+                    // Check if the square is empty
+                    if (*boardPtr[x][y - 2]->getPieceType() == pieceType::NONE)
+                    {
+                        // Check if the king would pass through check
+                        isKingInCheck(boardPtr, x, y - 2, kingColor, dummyMoves, check);
+                        if (!check)
+                        {
+                            // Check if the square is empty
+                            if (*boardPtr[x][y - 3]->getPieceType() == pieceType::NONE)
+                            {
+                                // Check if the king would pass through check
+                                isKingInCheck(boardPtr, x, y - 3, kingColor, dummyMoves, check);
+                                if (!check)
+                                {
+                                    // Check if the corner square is a rook and that it hasn't moved
+                                    if (*boardPtr[x][y - 4]->getPieceType() == pieceType::ROOK)
+                                    {
+                                        if (*boardPtr[x][y - 4]->getMoveCounter() == 0)
+                                        {
+                                            boardPtr[x][y]->addMove(x, y - 4);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 // Calculates the possible moves in a single direction in a directions provided
@@ -559,7 +671,7 @@ void ValidMoves::linearPiecePin(Piece *boardPtr[8][8], std::vector<std::vector<i
                     tempY += move[1];
                 }
                 // Else if the move type is equal to a king
-                else if (*boardPtr[tempX + move[0]][tempY + move[1]]->getPieceType() == pieceType::KING)
+                else if (*boardPtr[tempX + move[0]][tempY + move[1]]->getPieceType() == pieceType::KING && *boardPtr[tempX + move[0]][tempY + move[1]]->getPieceColor() != originalColor)
                 {
                     // If theres only one piece between the pinner and the king, then that piece is pinned
                     if (pieceCountBetweenPinnerAndKing == 1)

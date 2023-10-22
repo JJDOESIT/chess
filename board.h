@@ -36,9 +36,14 @@ private:
 
     int mode = playerMode::NONE;
 
-public:
+    int totalWhiteMoveCount = 0;
+
     std::vector<std::vector<int>> checkMovesList;
 
+    bool hasWhiteCastled = false;
+    bool hasBlackCastled = false;
+
+public:
     Piece *board[8][8] = {nullptr};
 
     void initPieceList();
@@ -65,6 +70,8 @@ public:
 
     void checkForPassant(Piece *boardPtr[8][8], int x, int y, bool simulate = false);
 
+    void castle(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, int &positionDifferential, bool simulat);
+
     void movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate);
 
     void movePieceWithCheck(sf::RenderWindow &window, Piece *boardPtr[8][8], std::vector<std::vector<int>> *moves, int x, int y);
@@ -81,7 +88,9 @@ public:
                   int positionOfOverWrittenY, int overWriteType,
                   int overWrittenType,
                   int overWriteColor,
-                  int overWrittenColor);
+                  int overWrittenColor,
+                  bool isPassant,
+                  bool isCastle);
 
     void drawSprites(sf::RenderWindow &window);
     void drawBoard(sf::RenderWindow &window);
@@ -89,6 +98,7 @@ public:
 
     friend class Input;
     friend class ValidMoves;
+    friend class Open;
 };
 
 #endif

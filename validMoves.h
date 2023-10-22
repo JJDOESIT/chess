@@ -33,6 +33,10 @@ public:
     void calculateLinearMoves(Board *board, Piece *boardPtr[8][8], std::vector<std::vector<int>> possibleMoves, int x, int y);
     void calculateSingleMoves(Piece *board[8][8], std::vector<std::vector<int>> possibleMoves, int x, int y);
 
+    bool isThisMoveEnPassant(Piece *boardPtr[8][8], int startX, int startY, int endX, int endY);
+
+    void checkCastle(Board *board, Piece *boardPtr[8][8], int x, int y);
+
     // Functions for calculating check
     void isKingInCheck(Piece *boardPtr[8][8], int kingX, int kingY, int kingColor, std::vector<std::vector<int>> &checkMoves, bool &isInCheck);
     void detectCheckFromPawn(Piece *boardPtr[8][8], int kingX, int kingY, int kingColor, std::vector<std::vector<int>> &checkMoves);

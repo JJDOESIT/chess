@@ -15,7 +15,7 @@ public:
                                        ValidMoves *checkValidMoves,
                                        int depth, int maximizingColor,
                                        int alpha,
-                                       int beta, int &count);
+                                       int beta);
 
     void rankBoard(Piece *boardPtr[8][8], int maximizingColor, int &whiteScore, int &blackScore);
 };

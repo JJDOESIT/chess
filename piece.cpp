@@ -53,18 +53,6 @@ void Piece::setPiecePosition(int x, int y)
     pieceInfo.position[1] = y;
 }
 
-// Return a pointer to hasMoved variable
-bool *Piece::getHasMoved()
-{
-    return &pieceInfo.hasMoved;
-}
-
-// Set hasMoved variable to true
-void Piece::setHasMoved()
-{
-    pieceInfo.hasMoved = true;
-}
-
 // Return a pointer to the moveCounter
 int *Piece::getMoveCounter()
 {
@@ -75,6 +63,12 @@ int *Piece::getMoveCounter()
 void Piece::increamentMoveCounter()
 {
     pieceInfo.moveCounter += 1;
+}
+
+// Decrease moveCounter by 1
+void Piece::decreamentMoveCounter()
+{
+    pieceInfo.moveCounter -= 1;
 }
 
 // Return a pointer to the list of valid moves a piece can make

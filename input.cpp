@@ -1,4 +1,6 @@
 #include "input.h"
+#include "globalValues.h"
+#include "pieceMobilityMatrices.h"
 
 // While the window is open, check for these events
 void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board, ValidMoves *checkValidMoves, std::vector<std::vector<int>> *moves, AI *ai)
@@ -48,15 +50,27 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
 
     if (*board->getCurrentTurn() == playerTurn::WHITE)
     {
-        if (!openingMoves.randomOpening(board, board->board, 0))
-        {
-            Piece *copyBoard[8][8];
-            board->copyArray(board->board, copyBoard);
-            int count = 0;
 
-            std::vector<int> move = ai->calculateBestMove(board, board->board, checkValidMoves, 4, pieceColor::WHITE, -9999, 9999, count);
-            board->movePieceWithoutCheck(board->board, move[0], move[1], move[2], move[3]);
-            board->deleteArray(copyBoard);
+        std::vector<int> matrixData = handleOpeningMove(board);
+
+        Piece *copyBoard[8][8];
+        board->copyArray(board->board, copyBoard);
+
+        std::vector<int> move = ai->calculateBestMove(board, board->board, checkValidMoves, global::depth, pieceColor::WHITE, -9999, 9999);
+        board->movePieceWithoutCheck(board->board, move[0], move[1], move[2], move[3]);
+        board->deleteArray(copyBoard);
+
+        if (isOpening)
+        {
+            if (matrixData[4] != -1)
+            {
+                matrices::restoreMatrixData(matrixData[0], matrixData[1], matrixData[2], matrixData[3]);
+            }
+            if (matrixData[4] == 0)
+            {
+                isOpening = false;
+                global::changeDepth(4);
+            }
         }
         board->switchTurn();
     }
@@ -103,4 +117,32 @@ void Input::getPossibleMoves(sf::RenderWindow &window, Board *board,
             checkValidMoves->getValidMoves(board, board->board, x, y, checkMoves, check, moves, NULL);
         }
     }
+}
+
+// Return a random number from the range start to end inclusive
+int Input::randomInt(int start, int end)
+{
+    std::srand(time(NULL));
+    return rand() % end + start;
+}
+
+std::vector<int> Input::handleOpeningMove(Board *board)
+{
+    // Choose a random opening move set for the AI
+    static bool isOpeningSetInitilized = false;
+    static int opening;
+
+    std::vector<int> matrixData;
+
+    if (!isOpeningSetInitilized)
+    {
+        opening = randomInt(1, 2);
+        isOpeningSetInitilized = true;
+    }
+
+    if (isOpening)
+    {
+        matrixData = openingMoves.randomOpening(board, board->board, opening);
+    }
+    return matrixData;
 }
