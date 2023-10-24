@@ -10,8 +10,7 @@
 int main()
 {
     Board board;
-    board.initPieceList();
-    board.fillBoard();
+    board.initilizeBoard();
 
     ValidMoves checkValidMoves;
     Input input;

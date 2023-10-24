@@ -18,16 +18,16 @@ private:
 
     struct moveData
     {
-        int positionOfOverWriteX;
-        int positionOfOverWriteY;
-        int positionOfOverWrittenX;
-        int positionOfOverWrittenY;
+        int positionOfAttackingX;
+        int positionOfAttackingY;
+        int positionOfDefendingX;
+        int positionOfDefendingY;
 
-        int overWriteType;
-        int overWrittenType;
+        int attackingType;
+        int defendingType;
 
-        int overWriteColor;
-        int overWrittenColor;
+        int attackingColor;
+        int defendingColor;
     } moveHistory;
 
     int swapBuffer[2];
@@ -48,14 +48,10 @@ private:
 public:
     Piece *board[8][8] = {nullptr};
 
-    void initPieceList();
-    std::vector<Piece> *getPieceList();
-    void printBoard(Piece *boardPtr[8][8]);
-    void initBoard();
-    void fillBoard();
+    void initilizeBoard();
     void overwritePiece(int type, int color, int x, int y);
     void swapPieces(Piece *boardPtr[8][8], int x1, int y1, int x2, int y2);
-    void takePiece(Piece *boardPtr[8][8], int overwriteX, int overwriteY, int overwrittenX, int overwrittenY, bool simulate = false);
+    void takePiece(Piece *boardPtr[8][8], int attackingX, int attackingY, int defendingX, int defendingY, bool simulate = false);
     void erasePiece(Piece *boardPtr[8][8], int x, int y);
     void clearPiece(Piece *boardPtr[8][8], int x, int y);
 
@@ -75,25 +71,25 @@ public:
     void checkPawnPromotion(Piece *boardPtr[8][8], int x, int y, bool simulate);
     void promotePiece(Piece *boardPtr[8][8], int x, int y, int type, bool simulate);
 
-    void castle(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, int &positionDifferential, bool simulat);
+    void castle(Piece *boardPtr[8][8], int attackingX, int attackingY, int defendingX, int defendingY, int &positionDifferential, bool simulat);
 
-    void movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate);
+    void movePiece(Piece *boardPtr[8][8], int attackingX, int attackingY, int defendingX, int defendingY, bool simulate);
 
     void movePieceWithCheck(sf::RenderWindow &window, Piece *boardPtr[8][8], std::vector<std::vector<int>> *moves, int x, int y);
 
-    void movePieceWithoutCheck(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate = false);
+    void movePieceWithoutCheck(Piece *boardPtr[8][8], int attackingX, int attackingY, int defendingX, int defendingY, bool simulate = false);
 
     void copyArray(Piece *copyFrom[8][8], Piece *copyTo[8][8]);
 
     void deleteArray(Piece *array[8][8]);
 
-    void undoMove(Piece *boardPtr[8][8], int positionOfOverWriteX,
-                  int positionOfOverWriteY,
-                  int positionOfOverWrittenX,
-                  int positionOfOverWrittenY, int overWriteType,
-                  int overWrittenType,
-                  int overWriteColor,
-                  int overWrittenColor,
+    void undoMove(Piece *boardPtr[8][8], int positionOfAttackingX,
+                  int positionOfAttackingY,
+                  int positionOfDefendingX,
+                  int positionOfDefendingY, int attackingType,
+                  int defendingType,
+                  int attackingColor,
+                  int defendingColor,
                   bool isPassant,
                   bool isCastle,
                   bool isPromotion);

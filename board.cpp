@@ -1,122 +1,54 @@
 #include "board.h"
 #include "globalValues.h"
 
-void Board::initPieceList()
+void Board::initilizeBoard()
 {
     // White pieces
-    Piece white_rook_one(pieceType::ROOK, pieceColor::WHITE, 0, 0, "./sprites/white_rook.png");
-    Piece white_knight_one(pieceType::KNIGHT, pieceColor::WHITE, 0, 1, "./sprites/white_knight.png");
-    Piece white_bishop_one(pieceType::BISHOP, pieceColor::WHITE, 0, 2, "./sprites/white_bishop.png");
-    Piece white_bishop_two(pieceType::BISHOP, pieceColor::WHITE, 0, 5, "./sprites/white_bishop.png");
-    Piece white_knight_two(pieceType::KNIGHT, pieceColor::WHITE, 0, 6, "./sprites/white_knight.png");
-    Piece white_rook_two(pieceType::ROOK, pieceColor::WHITE, 0, 7, "./sprites/white_rook.png");
-    Piece white_queen(pieceType::QUEEN, pieceColor::WHITE, 0, 3, "./sprites/white_queen.png");
-    Piece white_king(pieceType::KING, pieceColor::WHITE, 0, 4, "./sprites/white_king.png");
+    board[0][0] = new Piece(pieceType::ROOK, pieceColor::WHITE, 0, 0, "./sprites/white_rook.png");
+    board[0][1] = new Piece(pieceType::KNIGHT, pieceColor::WHITE, 0, 1, "./sprites/white_knight.png");
+    board[0][2] = new Piece(pieceType::BISHOP, pieceColor::WHITE, 0, 2, "./sprites/white_bishop.png");
+    board[0][5] = new Piece(pieceType::BISHOP, pieceColor::WHITE, 0, 5, "./sprites/white_bishop.png");
+    board[0][6] = new Piece(pieceType::KNIGHT, pieceColor::WHITE, 0, 6, "./sprites/white_knight.png");
+    board[0][7] = new Piece(pieceType::ROOK, pieceColor::WHITE, 0, 7, "./sprites/white_rook.png");
+    board[0][3] = new Piece(pieceType::QUEEN, pieceColor::WHITE, 0, 3, "./sprites/white_queen.png");
+    board[0][4] = new Piece(pieceType::KING, pieceColor::WHITE, 0, 4, "./sprites/white_king.png");
 
-    Piece white_pawn_one(pieceType::PAWN, pieceColor::WHITE, 1, 0, "./sprites/white_pawn.png");
-    Piece white_pawn_two(pieceType::PAWN, pieceColor::WHITE, 1, 1, "./sprites/white_pawn.png");
-    Piece white_pawn_three(pieceType::PAWN, pieceColor::WHITE, 1, 2, "./sprites/white_pawn.png");
-    Piece white_pawn_four(pieceType::PAWN, pieceColor::WHITE, 1, 3, "./sprites/white_pawn.png");
-    Piece white_pawn_five(pieceType::PAWN, pieceColor::WHITE, 1, 4, "./sprites/white_pawn.png");
-    Piece white_pawn_six(pieceType::PAWN, pieceColor::WHITE, 1, 5, "./sprites/white_pawn.png");
-    Piece white_pawn_seven(pieceType::PAWN, pieceColor::WHITE, 1, 6, "./sprites/white_pawn.png");
-    Piece white_pawn_eight(pieceType::PAWN, pieceColor::WHITE, 1, 7, "./sprites/white_pawn.png");
-
-    // Add white pieces to piece list
-    pieceList.push_back(white_rook_one);
-    pieceList.push_back(white_knight_one);
-    pieceList.push_back(white_bishop_one);
-    pieceList.push_back(white_bishop_two);
-    pieceList.push_back(white_knight_two);
-    pieceList.push_back(white_rook_two);
-    pieceList.push_back(white_queen);
-    pieceList.push_back(white_king);
-    pieceList.push_back(white_pawn_one);
-    pieceList.push_back(white_pawn_two);
-    pieceList.push_back(white_pawn_three);
-    pieceList.push_back(white_pawn_four);
-    pieceList.push_back(white_pawn_five);
-    pieceList.push_back(white_pawn_six);
-    pieceList.push_back(white_pawn_seven);
-    pieceList.push_back(white_pawn_eight);
+    board[1][0] = new Piece(pieceType::PAWN, pieceColor::WHITE, 1, 0, "./sprites/white_pawn.png");
+    board[1][1] = new Piece(pieceType::PAWN, pieceColor::WHITE, 1, 1, "./sprites/white_pawn.png");
+    board[1][2] = new Piece(pieceType::PAWN, pieceColor::WHITE, 1, 2, "./sprites/white_pawn.png");
+    board[1][3] = new Piece(pieceType::PAWN, pieceColor::WHITE, 1, 3, "./sprites/white_pawn.png");
+    board[1][4] = new Piece(pieceType::PAWN, pieceColor::WHITE, 1, 4, "./sprites/white_pawn.png");
+    board[1][5] = new Piece(pieceType::PAWN, pieceColor::WHITE, 1, 5, "./sprites/white_pawn.png");
+    board[1][6] = new Piece(pieceType::PAWN, pieceColor::WHITE, 1, 6, "./sprites/white_pawn.png");
+    board[1][7] = new Piece(pieceType::PAWN, pieceColor::WHITE, 1, 7, "./sprites/white_pawn.png");
 
     // Create 4 rows of empty pieces
     for (int row = 2; row < 6; row++)
     {
         for (int col = 0; col < 8; col++)
         {
-            pieceList.push_back(Piece(pieceType::NONE, pieceColor::NONE, row, col));
+            board[row][col] = new Piece(pieceType::NONE, pieceColor::NONE, row, col);
         }
     }
 
     // Black pieces
-    Piece black_rook_one(pieceType::ROOK, pieceColor::BLACK, 7, 0, "./sprites/black_rook.png");
-    Piece black_knight_one(pieceType::KNIGHT, pieceColor::BLACK, 7, 1, "./sprites/black_knight.png");
-    Piece black_bishop_one(pieceType::BISHOP, pieceColor::BLACK, 7, 2, "./sprites/black_bishop.png");
-    Piece black_bishop_two(pieceType::BISHOP, pieceColor::BLACK, 7, 5, "./sprites/black_bishop.png");
-    Piece black_knight_two(pieceType::KNIGHT, pieceColor::BLACK, 7, 6, "./sprites/black_knight.png");
-    Piece black_rook_two(pieceType::ROOK, pieceColor::BLACK, 7, 7, "./sprites/black_rook.png");
-    Piece black_queen(pieceType::QUEEN, pieceColor::BLACK, 7, 3, "./sprites/black_queen.png");
-    Piece black_king(pieceType::KING, pieceColor::BLACK, 7, 4, "./sprites/black_king.png");
+    board[7][0] = new Piece(pieceType::ROOK, pieceColor::BLACK, 7, 0, "./sprites/black_rook.png");
+    board[7][1] = new Piece(pieceType::KNIGHT, pieceColor::BLACK, 7, 1, "./sprites/black_knight.png");
+    board[7][2] = new Piece(pieceType::BISHOP, pieceColor::BLACK, 7, 2, "./sprites/black_bishop.png");
+    board[7][5] = new Piece(pieceType::BISHOP, pieceColor::BLACK, 7, 5, "./sprites/black_bishop.png");
+    board[7][6] = new Piece(pieceType::KNIGHT, pieceColor::BLACK, 7, 6, "./sprites/black_knight.png");
+    board[7][7] = new Piece(pieceType::ROOK, pieceColor::BLACK, 7, 7, "./sprites/black_rook.png");
+    board[7][3] = new Piece(pieceType::QUEEN, pieceColor::BLACK, 7, 3, "./sprites/black_queen.png");
+    board[7][4] = new Piece(pieceType::KING, pieceColor::BLACK, 7, 4, "./sprites/black_king.png");
 
-    Piece black_pawn_one(pieceType::PAWN, pieceColor::BLACK, 6, 0, "./sprites/black_pawn.png");
-    Piece black_pawn_two(pieceType::PAWN, pieceColor::BLACK, 6, 1, "./sprites/black_pawn.png");
-    Piece black_pawn_three(pieceType::PAWN, pieceColor::BLACK, 6, 2, "./sprites/black_pawn.png");
-    Piece black_pawn_four(pieceType::PAWN, pieceColor::BLACK, 6, 3, "./sprites/black_pawn.png");
-    Piece black_pawn_five(pieceType::PAWN, pieceColor::BLACK, 6, 4, "./sprites/black_pawn.png");
-    Piece black_pawn_six(pieceType::PAWN, pieceColor::BLACK, 6, 5, "./sprites/black_pawn.png");
-    Piece black_pawn_seven(pieceType::PAWN, pieceColor::BLACK, 6, 6, "./sprites/black_pawn.png");
-    Piece black_pawn_eight(pieceType::PAWN, pieceColor::BLACK, 6, 7, "./sprites/black_pawn.png");
-
-    // Add black pieces to piece list
-    pieceList.push_back(black_rook_one);
-    pieceList.push_back(black_knight_one);
-    pieceList.push_back(black_bishop_one);
-    pieceList.push_back(black_bishop_two);
-    pieceList.push_back(black_knight_two);
-    pieceList.push_back(black_rook_two);
-    pieceList.push_back(black_queen);
-    pieceList.push_back(black_king);
-    pieceList.push_back(black_pawn_one);
-    pieceList.push_back(black_pawn_two);
-    pieceList.push_back(black_pawn_three);
-    pieceList.push_back(black_pawn_four);
-    pieceList.push_back(black_pawn_five);
-    pieceList.push_back(black_pawn_six);
-    pieceList.push_back(black_pawn_seven);
-    pieceList.push_back(black_pawn_eight);
-}
-
-// Return a pointer to pieceList
-std::vector<Piece> *Board::getPieceList()
-{
-    return &pieceList;
-}
-
-// Print the board to the console
-void Board::printBoard(Piece *boardPtr[8][8])
-{
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 8; j++)
-        {
-            int *type = boardPtr[i][j]->getPieceType();
-            std::cout << *type;
-        }
-        std::cout << "\n";
-    }
-    std::cout << "\n";
-}
-
-// Fill the board with pieces in the piece list
-void Board::fillBoard()
-{
-    for (int i = 0; i < pieceList.size(); i++)
-    {
-        int *piecePosition = pieceList[i].getPiecePosition();
-        Piece *piecePtr = &pieceList[i];
-        board[piecePosition[0]][piecePosition[1]] = piecePtr;
-    }
+    board[6][0] = new Piece(pieceType::PAWN, pieceColor::BLACK, 6, 0, "./sprites/black_pawn.png");
+    board[6][1] = new Piece(pieceType::PAWN, pieceColor::BLACK, 6, 1, "./sprites/black_pawn.png");
+    board[6][2] = new Piece(pieceType::PAWN, pieceColor::BLACK, 6, 2, "./sprites/black_pawn.png");
+    board[6][3] = new Piece(pieceType::PAWN, pieceColor::BLACK, 6, 3, "./sprites/black_pawn.png");
+    board[6][4] = new Piece(pieceType::PAWN, pieceColor::BLACK, 6, 4, "./sprites/black_pawn.png");
+    board[6][5] = new Piece(pieceType::PAWN, pieceColor::BLACK, 6, 5, "./sprites/black_pawn.png");
+    board[6][6] = new Piece(pieceType::PAWN, pieceColor::BLACK, 6, 6, "./sprites/black_pawn.png");
+    board[6][7] = new Piece(pieceType::PAWN, pieceColor::BLACK, 6, 7, "./sprites/black_pawn.png");
 }
 
 // Testing only: Place any piece on the board
@@ -178,14 +110,14 @@ void Board::swapPieces(Piece *boardPtr[8][8], int x1, int y1, int x2, int y2)
 }
 
 // Take a piece and deconstruct it
-void Board::takePiece(Piece *boardPtr[8][8], int overwriteX, int overwriteY, int overwrittenX, int overwrittenY, bool simulate)
+void Board::takePiece(Piece *boardPtr[8][8], int attackingX, int attackingY, int defendingX, int defendingY, bool simulate)
 {
     if (!simulate)
     {
-        erasePiece(boardPtr, overwrittenX, overwrittenY);
+        erasePiece(boardPtr, defendingX, defendingY);
     }
-    clearPiece(boardPtr, overwrittenX, overwrittenY);
-    swapPieces(boardPtr, overwriteX, overwriteY, overwrittenX, overwrittenY);
+    clearPiece(boardPtr, defendingX, defendingY);
+    swapPieces(boardPtr, attackingX, attackingY, defendingX, defendingY);
 }
 
 // Erase piece
@@ -324,18 +256,18 @@ void Board::promotePiece(Piece *boardPtr[8][8], int x, int y, int type, bool sim
 }
 
 // Castle a king and rook
-void Board::castle(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, int &positionDifferential, bool simulate)
+void Board::castle(Piece *boardPtr[8][8], int attackingX, int attackingY, int defendingX, int defendingY, int &positionDifferential, bool simulate)
 {
-    if (overWrittenY == 0)
+    if (defendingY == 0)
     {
-        swapPieces(boardPtr, overWriteX, overWriteY, overWriteX, overWriteY - 2);
-        swapPieces(boardPtr, overWrittenX, overWrittenY, overWrittenX, overWrittenY + 3);
+        swapPieces(boardPtr, attackingX, attackingY, attackingX, attackingY - 2);
+        swapPieces(boardPtr, defendingX, defendingY, defendingX, defendingY + 3);
         positionDifferential = 2;
     }
-    else if (overWrittenY == 7)
+    else if (defendingY == 7)
     {
-        swapPieces(boardPtr, overWriteX, overWriteY, overWriteX, overWriteY + 2);
-        swapPieces(boardPtr, overWrittenX, overWrittenY, overWrittenX, overWrittenY - 2);
+        swapPieces(boardPtr, attackingX, attackingY, attackingX, attackingY + 2);
+        swapPieces(boardPtr, defendingX, defendingY, defendingX, defendingY - 2);
         positionDifferential = -1;
     }
 
@@ -353,46 +285,46 @@ void Board::castle(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int ov
 }
 
 // Move piece
-void Board::movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate)
+void Board::movePiece(Piece *boardPtr[8][8], int attackingX, int attackingY, int defendingX, int defendingY, bool simulate)
 {
     // Increament the pieces total move count
-    boardPtr[overWriteX][overWriteY]->increamentMoveCounter();
+    boardPtr[attackingX][attackingY]->increamentMoveCounter();
 
     int yPositionDifferential = 0;
     bool isCastle;
 
     // If the square a piece is moving too is empty, swap the two pointers
-    if (*boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::NONE)
+    if (*boardPtr[defendingX][defendingY]->getPieceType() == pieceType::NONE)
     {
-        swapPieces(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY);
+        swapPieces(boardPtr, attackingX, attackingY, defendingX, defendingY);
 
         // If the attacking piece is a pawn, check if the attack was a passant move
-        if (*boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::PAWN)
+        if (*boardPtr[defendingX][defendingY]->getPieceType() == pieceType::PAWN)
         {
-            checkForPassant(boardPtr, overWrittenX, overWrittenY, simulate);
+            checkForPassant(boardPtr, defendingX, defendingY, simulate);
         }
     }
     // Else if the square has another piece on it, destory the piece and deconstruct its data
     else
     {
         // If the current move is a castle, castle the king and the rook
-        if (*boardPtr[overWriteX][overWriteY]->getPieceType() == pieceType::KING &&
-            *boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::ROOK &&
-            *boardPtr[overWriteX][overWriteY]->getPieceColor() == *boardPtr[overWrittenX][overWrittenY]->getPieceColor())
+        if (*boardPtr[attackingX][attackingY]->getPieceType() == pieceType::KING &&
+            *boardPtr[defendingX][defendingY]->getPieceType() == pieceType::ROOK &&
+            *boardPtr[attackingX][attackingY]->getPieceColor() == *boardPtr[defendingX][defendingY]->getPieceColor())
         {
-            boardPtr[overWrittenX][overWrittenY]->increamentMoveCounter();
-            castle(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY, yPositionDifferential, simulate);
+            boardPtr[defendingX][defendingY]->increamentMoveCounter();
+            castle(boardPtr, attackingX, attackingY, defendingX, defendingY, yPositionDifferential, simulate);
         }
         // Else take the piece normally
         else
         {
-            takePiece(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY, simulate);
+            takePiece(boardPtr, attackingX, attackingY, defendingX, defendingY, simulate);
         }
     }
 
-    if (*boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::PAWN)
+    if (*boardPtr[defendingX][defendingY]->getPieceType() == pieceType::PAWN)
     {
-        checkPawnPromotion(boardPtr, overWrittenX, overWrittenY, simulate);
+        checkPawnPromotion(boardPtr, defendingX, defendingY, simulate);
     }
 
     // Set the position of the last moved piece to its corresponding color
@@ -401,13 +333,13 @@ void Board::movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int
         if (*getCurrentTurn() == playerTurn::WHITE)
         {
             totalWhiteMoveCount += 1;
-            setPositionOfLastMovedWhitePiece(overWrittenX, overWrittenY);
+            setPositionOfLastMovedWhitePiece(defendingX, defendingY);
         }
         else
         {
-            setPositionOfLastMovedBlackPiece(overWrittenX, overWrittenY);
+            setPositionOfLastMovedBlackPiece(defendingX, defendingY);
         }
-        setPositionOfMostRecentPiece(overWrittenX, overWrittenY + yPositionDifferential);
+        setPositionOfMostRecentPiece(defendingX, defendingY + yPositionDifferential);
     }
 }
 
@@ -436,19 +368,19 @@ void Board::movePieceWithCheck(sf::RenderWindow &window, Piece *boardPtr[8][8], 
 }
 
 // Move piece without checking if the new position is a valid move
-void Board::movePieceWithoutCheck(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, bool simulate)
+void Board::movePieceWithoutCheck(Piece *boardPtr[8][8], int attackingX, int attackingY, int defendingX, int defendingY, bool simulate)
 {
-    movePiece(boardPtr, overWriteX, overWriteY, overWrittenX, overWrittenY, simulate);
+    movePiece(boardPtr, attackingX, attackingY, defendingX, defendingY, simulate);
 }
 
 // Undo move (used in AI calculations)
-void Board::undoMove(Piece *boardPtr[8][8], int positionOfOverWriteX,
-                     int positionOfOverWriteY,
-                     int positionOfOverWrittenX,
-                     int positionOfOverWrittenY, int overWriteType,
-                     int overWrittenType,
-                     int overWriteColor,
-                     int overWrittenColor,
+void Board::undoMove(Piece *boardPtr[8][8], int positionOfAttackingX,
+                     int positionOfAttackingY,
+                     int positionOfDefendingX,
+                     int positionOfDefendingY, int attackingType,
+                     int defendingType,
+                     int attackingColor,
+                     int defendingColor,
                      bool isPassant,
                      bool isCastle,
                      bool isPromotion)
@@ -458,53 +390,53 @@ void Board::undoMove(Piece *boardPtr[8][8], int positionOfOverWriteX,
     {
         // Swap the two pieces back
         swapPieces(boardPtr,
-                   positionOfOverWriteX,
-                   positionOfOverWriteY,
-                   positionOfOverWrittenX,
-                   positionOfOverWrittenY);
+                   positionOfAttackingX,
+                   positionOfAttackingY,
+                   positionOfDefendingX,
+                   positionOfDefendingY);
 
         // Restore the original data types of the pieces
-        board[positionOfOverWriteX][positionOfOverWriteY]->setPieceType(overWriteType);
-        board[positionOfOverWriteX][positionOfOverWriteY]->setPieceColor(overWriteColor);
+        board[positionOfAttackingX][positionOfAttackingY]->setPieceType(attackingType);
+        board[positionOfAttackingX][positionOfAttackingY]->setPieceColor(attackingColor);
 
-        board[positionOfOverWrittenX][positionOfOverWrittenY]->setPieceType(overWrittenType);
-        board[positionOfOverWrittenX][positionOfOverWrittenY]->setPieceColor(overWrittenColor);
+        board[positionOfDefendingX][positionOfDefendingY]->setPieceType(defendingType);
+        board[positionOfDefendingX][positionOfDefendingY]->setPieceColor(defendingColor);
 
-        board[positionOfOverWriteX][positionOfOverWriteY]->decreamentMoveCounter();
+        board[positionOfAttackingX][positionOfAttackingY]->decreamentMoveCounter();
     }
 
     // If the piece was castled
     else
     {
-        if (positionOfOverWrittenY == 0)
+        if (positionOfDefendingY == 0)
         {
-            swapPieces(boardPtr, positionOfOverWriteX, positionOfOverWriteY, positionOfOverWriteX, positionOfOverWriteY - 2);
-            swapPieces(boardPtr, positionOfOverWrittenX, positionOfOverWrittenY, positionOfOverWrittenX, positionOfOverWrittenY + 3);
+            swapPieces(boardPtr, positionOfAttackingX, positionOfAttackingY, positionOfAttackingX, positionOfAttackingY - 2);
+            swapPieces(boardPtr, positionOfDefendingX, positionOfDefendingY, positionOfDefendingX, positionOfDefendingY + 3);
         }
-        else if (positionOfOverWrittenY == 7)
+        else if (positionOfDefendingY == 7)
         {
-            swapPieces(boardPtr, positionOfOverWriteX, positionOfOverWriteY, positionOfOverWriteX, positionOfOverWriteY + 2);
-            swapPieces(boardPtr, positionOfOverWrittenX, positionOfOverWrittenY, positionOfOverWrittenX, positionOfOverWrittenY - 2);
+            swapPieces(boardPtr, positionOfAttackingX, positionOfAttackingY, positionOfAttackingX, positionOfAttackingY + 2);
+            swapPieces(boardPtr, positionOfDefendingX, positionOfDefendingY, positionOfDefendingX, positionOfDefendingY - 2);
         }
-        board[positionOfOverWriteX][positionOfOverWriteY]->decreamentMoveCounter();
-        board[positionOfOverWrittenX][positionOfOverWrittenY]->decreamentMoveCounter();
+        board[positionOfAttackingX][positionOfAttackingY]->decreamentMoveCounter();
+        board[positionOfDefendingX][positionOfDefendingY]->decreamentMoveCounter();
     }
 
     // Used in the undo move section of the AI. If it sees that the AI did an En Passant Capture, then it will
     // not only undo the swapping of the two pieces, but restore the captured pawn
     if (isPassant)
     {
-        if (overWriteColor == pieceColor::WHITE)
+        if (attackingColor == pieceColor::WHITE)
         {
-            boardPtr[positionOfOverWrittenX - 1][positionOfOverWrittenY]->setPieceColor(pieceColor::BLACK);
-            boardPtr[positionOfOverWrittenX - 1][positionOfOverWrittenY]->setPieceType(pieceType::PAWN);
+            boardPtr[positionOfDefendingX - 1][positionOfDefendingY]->setPieceColor(pieceColor::BLACK);
+            boardPtr[positionOfDefendingX - 1][positionOfDefendingY]->setPieceType(pieceType::PAWN);
         }
     }
 
     // Turn the promoted piece back into a pawn
     if (isPromotion)
     {
-        boardPtr[positionOfOverWriteX][positionOfOverWriteY]->setPieceType(pieceType::PAWN);
+        boardPtr[positionOfAttackingX][positionOfAttackingY]->setPieceType(pieceType::PAWN);
     }
 }
 
