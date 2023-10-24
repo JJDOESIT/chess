@@ -9,7 +9,7 @@ class Open
 {
 private:
     ValidMoves checkValidMoves;
-    const int skewValue = 90;
+    const int skewValue = 60;
 
 public:
     std::vector<int> randomOpening(Board *board, Piece *boardPtr[8][8], int randomNumber);

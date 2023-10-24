@@ -1,14 +1,12 @@
-#include <SFML/Graphics.hpp>
-#include "board.h"
-#include "validMoves.h"
-#include "globalEnum.h"
 #include "ai.h"
 #include "open.h"
-#include <cstdlib>
 #include "time.h"
+
+#include <cstdlib>
 
 #ifndef INPUT
 #define INPUT
+
 class Input
 {
 private:
