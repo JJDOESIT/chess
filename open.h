@@ -1,5 +1,3 @@
-#include "board.h"
-#include "piece.h"
 #include "validMoves.h"
 #include <chrono>
 #include <thread>

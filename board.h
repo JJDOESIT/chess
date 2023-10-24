@@ -1,5 +1,6 @@
 #include "piece.h"
 #include "globalEnum.h"
+
 #include <vector>
 #include <iostream>
 

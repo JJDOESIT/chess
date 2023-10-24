@@ -1,7 +1,4 @@
-#include "board.h"
 #include "validMoves.h"
-#include <vector>
-#include "piece.h"
 
 #ifndef AIALGORITHM
 #define AIALGORITHM

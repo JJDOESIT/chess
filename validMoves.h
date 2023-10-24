@@ -1,6 +1,5 @@
-#include "piece.h"
 #include "board.h"
-#include <iostream>
+
 #include <vector>
 #include <string>
 
@@ -21,7 +20,6 @@ public:
                        std::vector<std::vector<std::vector<int>>> *allPossibleMoves = NULL);
 
     void compareTwoMovesLists(Piece *boardPtr[8][8], int x, int y, std::vector<std::vector<int>> moveListOne, std::vector<std::vector<int>> moveListTwo);
-    void printValidMoves(Piece *board[8][8], int x, int y);
 
     void getPawn(Board *board, Piece *boardPtr[8][8], int x, int y);
     void getRook(Board *board, Piece *boardPtr[8][8], int x, int y);

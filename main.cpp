@@ -1,22 +1,21 @@
-#include "board.h"
-#include <vector>
 #include "piece.h"
 #include "input.h"
 #include "validMoves.h"
-#include <iostream>
+#include "board.h"
 #include "ai.h"
+
+#include <vector>
+#include <iostream>
 #include <SFML/Graphics.hpp>
 
 int main()
 {
     Board board;
-    board.initilizeBoard();
-
     ValidMoves checkValidMoves;
     Input input;
-
     AI ai;
 
+    board.initilizeBoard();
     std::vector<std::vector<int>> moves;
 
     sf::RenderWindow window(sf::VideoMode(544, 544), "Chess");

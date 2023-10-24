@@ -113,21 +113,6 @@ void ValidMoves::compareTwoMovesLists(Piece *boardPtr[8][8], int x, int y, std::
     }
 }
 
-// Print out valid moves
-void ValidMoves::printValidMoves(Piece *board[8][8], int x, int y)
-{
-    std::vector<std::vector<int>> *validMovePtr = board[x][y]->getValidMoves();
-    for (auto move : *validMovePtr)
-    {
-        std::cout << "(";
-        for (auto position : move)
-        {
-            std::cout << position << ",";
-        }
-        std::cout << ") ";
-    }
-}
-
 // Get possible moves for pawn
 void ValidMoves::getPawn(Board *board, Piece *boardPtr[8][8], int x, int y)
 {
