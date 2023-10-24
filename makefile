@@ -9,6 +9,7 @@ rm sfml-app
 rm validMoves.o
 rm input.o
 rm ai.o
+rm open.o
 endef
 
 all:

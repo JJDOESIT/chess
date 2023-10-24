@@ -250,73 +250,76 @@ void Board::checkForPassant(Piece *boardPtr[8][8], int x, int y, bool simulate)
 }
 
 // Check if a pawn should be promoted
-void Board::checkPawnPromotion(Piece *boardPtr[8][8], int x, int y)
+void Board::checkPawnPromotion(Piece *boardPtr[8][8], int x, int y, bool simulate)
 {
     if (*boardPtr[x][y]->getPieceColor() == pieceColor::WHITE)
     {
         if (x == 7)
         {
-            promotePiece(boardPtr, x, y, pieceType::QUEEN);
+            promotePiece(boardPtr, x, y, pieceType::QUEEN, simulate);
         }
     }
     else
     {
         if (x == 0)
         {
-            promotePiece(boardPtr, x, y, pieceType::QUEEN);
+            promotePiece(boardPtr, x, y, pieceType::QUEEN, simulate);
         }
     }
 }
 
 // Promote a piece into the given type
-void Board::promotePiece(Piece *boardPtr[8][8], int x, int y, int type)
+void Board::promotePiece(Piece *boardPtr[8][8], int x, int y, int type, bool simulate)
 {
     boardPtr[x][y]->setPieceType(type);
 
-    int color = *boardPtr[x][y]->getPieceColor();
-
-    switch (type)
+    if (!simulate)
     {
-    case (pieceType::ROOK):
-        if (color == pieceColor::WHITE)
+        int color = *boardPtr[x][y]->getPieceColor();
+
+        switch (type)
         {
-            boardPtr[x][y]->setTexture("./sprites/white_rook.png");
+        case (pieceType::ROOK):
+            if (color == pieceColor::WHITE)
+            {
+                boardPtr[x][y]->setTexture("./sprites/white_rook.png");
+            }
+            else
+            {
+                boardPtr[x][y]->setTexture("./sprites/black_rook.png");
+            }
+            break;
+        case (pieceType::BISHOP):
+            if (color == pieceColor::WHITE)
+            {
+                boardPtr[x][y]->setTexture("./sprites/white_bishop.png");
+            }
+            else
+            {
+                boardPtr[x][y]->setTexture("./sprites/black_bishop.png");
+            }
+            break;
+        case (pieceType::KNIGHT):
+            if (color == pieceColor::WHITE)
+            {
+                boardPtr[x][y]->setTexture("./sprites/white_knight.png");
+            }
+            else
+            {
+                boardPtr[x][y]->setTexture("./sprites/black_knight.png");
+            }
+            break;
+        case (pieceType::QUEEN):
+            if (color == pieceColor::WHITE)
+            {
+                boardPtr[x][y]->setTexture("./sprites/white_queen.png");
+            }
+            else
+            {
+                boardPtr[x][y]->setTexture("./sprites/black_queen.png");
+            }
+            break;
         }
-        else
-        {
-            boardPtr[x][y]->setTexture("./sprites/black_rook.png");
-        }
-        break;
-    case (pieceType::BISHOP):
-        if (color == pieceColor::WHITE)
-        {
-            boardPtr[x][y]->setTexture("./sprites/white_bishop.png");
-        }
-        else
-        {
-            boardPtr[x][y]->setTexture("./sprites/black_bishop.png");
-        }
-        break;
-    case (pieceType::KNIGHT):
-        if (color == pieceColor::WHITE)
-        {
-            boardPtr[x][y]->setTexture("./sprites/white_knight.png");
-        }
-        else
-        {
-            boardPtr[x][y]->setTexture("./sprites/black_knight.png");
-        }
-        break;
-    case (pieceType::QUEEN):
-        if (color == pieceColor::WHITE)
-        {
-            boardPtr[x][y]->setTexture("./sprites/white_queen.png");
-        }
-        else
-        {
-            boardPtr[x][y]->setTexture("./sprites/black_queen.png");
-        }
-        break;
     }
 }
 
@@ -389,7 +392,7 @@ void Board::movePiece(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int
 
     if (*boardPtr[overWrittenX][overWrittenY]->getPieceType() == pieceType::PAWN)
     {
-        checkPawnPromotion(boardPtr, overWrittenX, overWrittenY);
+        checkPawnPromotion(boardPtr, overWrittenX, overWrittenY, simulate);
     }
 
     // Set the position of the last moved piece to its corresponding color
@@ -447,9 +450,10 @@ void Board::undoMove(Piece *boardPtr[8][8], int positionOfOverWriteX,
                      int overWriteColor,
                      int overWrittenColor,
                      bool isPassant,
-                     bool isCastle)
+                     bool isCastle,
+                     bool isPromotion)
 {
-
+    // If the piece was not castled
     if (!isCastle)
     {
         // Swap the two pieces back
@@ -469,6 +473,7 @@ void Board::undoMove(Piece *boardPtr[8][8], int positionOfOverWriteX,
         board[positionOfOverWriteX][positionOfOverWriteY]->decreamentMoveCounter();
     }
 
+    // If the piece was castled
     else
     {
         if (positionOfOverWrittenY == 0)
@@ -494,6 +499,12 @@ void Board::undoMove(Piece *boardPtr[8][8], int positionOfOverWriteX,
             boardPtr[positionOfOverWrittenX - 1][positionOfOverWrittenY]->setPieceColor(pieceColor::BLACK);
             boardPtr[positionOfOverWrittenX - 1][positionOfOverWrittenY]->setPieceType(pieceType::PAWN);
         }
+    }
+
+    // Turn the promoted piece back into a pawn
+    if (isPromotion)
+    {
+        boardPtr[positionOfOverWriteX][positionOfOverWriteY]->setPieceType(pieceType::PAWN);
     }
 }
 

@@ -72,8 +72,8 @@ public:
 
     void checkForPassant(Piece *boardPtr[8][8], int x, int y, bool simulate = false);
 
-    void checkPawnPromotion(Piece *boardPtr[8][8], int x, int y);
-    void promotePiece(Piece *boardPtr[8][8], int x, int y, int type);
+    void checkPawnPromotion(Piece *boardPtr[8][8], int x, int y, bool simulate);
+    void promotePiece(Piece *boardPtr[8][8], int x, int y, int type, bool simulate);
 
     void castle(Piece *boardPtr[8][8], int overWriteX, int overWriteY, int overWrittenX, int overWrittenY, int &positionDifferential, bool simulat);
 
@@ -95,7 +95,8 @@ public:
                   int overWriteColor,
                   int overWrittenColor,
                   bool isPassant,
-                  bool isCastle);
+                  bool isCastle,
+                  bool isPromotion);
 
     void drawSprites(sf::RenderWindow &window);
     void drawBoard(sf::RenderWindow &window);

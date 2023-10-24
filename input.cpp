@@ -48,10 +48,11 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
         }
     }
 
+    // If the current turn is white
     if (*board->getCurrentTurn() == playerTurn::WHITE)
     {
-
-        /* if (!board->isPieceMoving)
+        // If the no pieces are in the process of moving
+        if (!board->isPieceMoving)
         {
             std::vector<int> matrixData = handleOpeningMove(board);
 
@@ -75,7 +76,7 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
                 }
             }
             board->switchTurn();
-        } */
+        }
     }
 }
 
@@ -129,6 +130,7 @@ int Input::randomInt(int start, int end)
     return rand() % end + start;
 }
 
+// Handle the opening sequence from a soft-coded move set
 std::vector<int> Input::handleOpeningMove(Board *board)
 {
     // Choose a random opening move set for the AI

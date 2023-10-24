@@ -90,6 +90,8 @@ std::vector<int> AI::calculateBestMove(Board *board,
         // Check if the possible is a castle
         bool castle = (startType == pieceType::KING && endType == pieceType::ROOK && startColor == endColor);
 
+        bool promotion = false;
+
         // Move the piece
         board->movePiece(boardCopy, startX, startY, endX, endY, true);
 
@@ -103,8 +105,13 @@ std::vector<int> AI::calculateBestMove(Board *board,
             moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::WHITE, alpha, beta);
         }
 
+        if (startType == pieceType::PAWN && startType != *boardCopy[endX][endY]->getPieceType())
+        {
+            promotion = true;
+        }
+
         // Undo the move
-        board->undoMove(boardCopy, startX, startY, endX, endY, startType, endType, startColor, endColor, passant, castle);
+        board->undoMove(boardCopy, startX, startY, endX, endY, startType, endType, startColor, endColor, passant, castle, promotion);
 
         // If the current turn is white
         if (maximizingColor == pieceColor::WHITE)
