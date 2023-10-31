@@ -8,7 +8,6 @@ class AI
 
 public:
     std::vector<int> calculateBestMove(Board *board,
-                                       Piece *boardCopy[8][8],
                                        ValidMoves *checkValidMoves,
                                        int depth, int maximizingColor,
                                        int alpha,

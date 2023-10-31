@@ -134,6 +134,24 @@ void Board::clearPiece(Piece *boardPtr[8][8], int x, int y)
     boardPtr[x][y]->setPieceColor(pieceColor::NONE);
 }
 
+// Set whether the player is in check or not
+void Board::setIsPlayerInCheck(bool check)
+{
+    isPlayerInCheck = check;
+}
+
+// Return true of false depending on whether the player is in check
+bool Board::getIsPlayerInCheck()
+{
+    return isPlayerInCheck;
+}
+
+// Add position vector to displayCheckList
+void Board::addPieceToDisplayCheckList(int x, int y)
+{
+    displayCheckList.push_back(std::vector<int>{x, y});
+}
+
 // Return a pointer to current turn
 int *Board::getCurrentTurn()
 {
@@ -260,12 +278,30 @@ void Board::castle(Piece *boardPtr[8][8], int attackingX, int attackingY, int de
 {
     if (defendingY == 0)
     {
+        if (*boardPtr[attackingX][attackingY]->getPieceColor() == pieceColor::WHITE)
+        {
+            positionOfWhiteKing = std::vector<int>{attackingX, attackingY - 2};
+        }
+        else
+        {
+            positionOfBlackKing = std::vector<int>{attackingX, attackingY - 2};
+        }
+
         swapPieces(boardPtr, attackingX, attackingY, attackingX, attackingY - 2);
         swapPieces(boardPtr, defendingX, defendingY, defendingX, defendingY + 3);
         positionDifferential = 2;
     }
     else if (defendingY == 7)
     {
+        if (*boardPtr[attackingX][attackingY]->getPieceColor() == pieceColor::WHITE)
+        {
+            positionOfWhiteKing = std::vector<int>{attackingX, attackingY + 2};
+        }
+        else
+        {
+            positionOfBlackKing = std::vector<int>{attackingX, attackingY + 2};
+        }
+
         swapPieces(boardPtr, attackingX, attackingY, attackingX, attackingY + 2);
         swapPieces(boardPtr, defendingX, defendingY, defendingX, defendingY - 2);
         positionDifferential = -1;
@@ -291,7 +327,7 @@ void Board::movePiece(Piece *boardPtr[8][8], int attackingX, int attackingY, int
     boardPtr[attackingX][attackingY]->increamentMoveCounter();
 
     int yPositionDifferential = 0;
-    bool isCastle;
+    bool isCastle = false;
 
     // If the square a piece is moving too is empty, swap the two pointers
     if (*boardPtr[defendingX][defendingY]->getPieceType() == pieceType::NONE)
@@ -312,6 +348,10 @@ void Board::movePiece(Piece *boardPtr[8][8], int attackingX, int attackingY, int
             *boardPtr[defendingX][defendingY]->getPieceType() == pieceType::ROOK &&
             *boardPtr[attackingX][attackingY]->getPieceColor() == *boardPtr[defendingX][defendingY]->getPieceColor())
         {
+            isCastle = true;
+        }
+        if (isCastle)
+        {
             boardPtr[defendingX][defendingY]->increamentMoveCounter();
             castle(boardPtr, attackingX, attackingY, defendingX, defendingY, yPositionDifferential, simulate);
         }
@@ -319,6 +359,21 @@ void Board::movePiece(Piece *boardPtr[8][8], int attackingX, int attackingY, int
         else
         {
             takePiece(boardPtr, attackingX, attackingY, defendingX, defendingY, simulate);
+        }
+    }
+
+    if (!isCastle)
+    {
+        if (*boardPtr[defendingX][defendingY]->getPieceType() == pieceType::KING)
+        {
+            if (*boardPtr[defendingX][defendingY]->getPieceColor() == pieceColor::WHITE)
+            {
+                positionOfWhiteKing = std::vector<int>{defendingX, defendingY};
+            }
+            else
+            {
+                positionOfBlackKing = std::vector<int>{defendingX, defendingY};
+            }
         }
     }
 
@@ -344,40 +399,31 @@ void Board::movePiece(Piece *boardPtr[8][8], int attackingX, int attackingY, int
 }
 
 // Move a piece and check if the new position is a valid move
-void Board::movePieceWithCheck(sf::RenderWindow &window, Piece *boardPtr[8][8], std::vector<std::vector<int>> *moves, int x, int y)
+bool Board::movePieceWithCheck(sf::RenderWindow &window, Piece *boardPtr[8][8], std::vector<std::vector<int>> *moves, int x, int y)
 {
+    bool validMove = false;
+
     for (auto move : *moves)
     {
         if (move[0] == x && move[1] == y)
         {
             // Move piece
             movePiece(boardPtr, swapBuffer[0], swapBuffer[1], x, y, false);
-
-            // Re-draw the board
-            drawBoard(window);
-            drawSprites(window);
-            window.display();
-
-            // Switch current turn
-            switchTurn();
+            validMove = true;
         }
     }
     // Swap modes and clear possible moves list
     mode = playerMode::NONE;
     moves->clear();
-}
-
-// Move piece without checking if the new position is a valid move
-void Board::movePieceWithoutCheck(Piece *boardPtr[8][8], int attackingX, int attackingY, int defendingX, int defendingY, bool simulate)
-{
-    movePiece(boardPtr, attackingX, attackingY, defendingX, defendingY, simulate);
+    return validMove;
 }
 
 // Undo move (used in AI calculations)
 void Board::undoMove(Piece *boardPtr[8][8], int positionOfAttackingX,
                      int positionOfAttackingY,
                      int positionOfDefendingX,
-                     int positionOfDefendingY, int attackingType,
+                     int positionOfDefendingY,
+                     int attackingType,
                      int defendingType,
                      int attackingColor,
                      int defendingColor,
@@ -438,29 +484,17 @@ void Board::undoMove(Piece *boardPtr[8][8], int positionOfAttackingX,
     {
         boardPtr[positionOfAttackingX][positionOfAttackingY]->setPieceType(pieceType::PAWN);
     }
-}
 
-// Copy data from one board to another
-void Board::copyArray(Piece *copyFrom[8][8], Piece *copyTo[8][8])
-{
-    for (int row = 0; row < 8; row++)
+    if (attackingType == pieceType::KING)
     {
-        for (int col = 0; col < 8; col++)
+        if (attackingColor == pieceColor::WHITE)
         {
-            Piece *newPiece = new Piece(*copyFrom[row][col]);
-            copyTo[row][col] = newPiece;
+
+            positionOfWhiteKing = std::vector<int>{positionOfAttackingX, positionOfAttackingY};
         }
-    }
-}
-
-// Deconstruct board state
-void Board::deleteArray(Piece *array[8][8])
-{
-    for (int row = 0; row < 8; row++)
-    {
-        for (int col = 0; col < 8; col++)
+        else
         {
-            delete array[row][col];
+            positionOfBlackKing = std::vector<int>{positionOfAttackingX, positionOfAttackingY};
         }
     }
 }
@@ -507,18 +541,31 @@ void Board::drawSprites(sf::RenderWindow &window)
         }
     }
 
-    // Draw a border around the most recently moved piece
-
+    // If no pieces are moving
     if (!isPieceMoving)
     {
         const int outlineThickness = 4;
-        sf::RectangleShape lastMovedPiece;
-        lastMovedPiece.setFillColor(sf::Color::Transparent);
-        lastMovedPiece.setSize(sf::Vector2f(global::squareSize - (outlineThickness * 2), global::squareSize - (outlineThickness * 2)));
-        lastMovedPiece.setPosition(sf::Vector2f((positionOfMostRecentMove[1] * global::squareSize) + outlineThickness, (positionOfMostRecentMove[0] * global::squareSize) + outlineThickness));
-        lastMovedPiece.setOutlineThickness(outlineThickness);
-        lastMovedPiece.setOutlineColor(sf::Color(255, 215, 0, 255));
-        window.draw(lastMovedPiece);
+
+        // Draw a border around the most recently moved piece
+        drawBorder(window, positionOfMostRecentMove[0], positionOfMostRecentMove[1], 255, 215, 0, outlineThickness);
+
+        // Draw a border around the pieces contributing to check
+        if (isPlayerInCheck)
+        {
+            for (std::vector<int> move : displayCheckList)
+            {
+                drawBorder(window, move[0], move[1], 255, 0, 0, outlineThickness);
+
+                if (*getCurrentTurn() == playerTurn::WHITE)
+                {
+                    drawBorder(window, positionOfWhiteKing[0], positionOfWhiteKing[1], 255, 0, 0, outlineThickness);
+                }
+                else
+                {
+                    drawBorder(window, positionOfBlackKing[0], positionOfBlackKing[1], 255, 0, 0, outlineThickness);
+                }
+            }
+        }
     }
 }
 
@@ -557,4 +604,16 @@ void Board::drawPossibleMoves(sf::RenderWindow &window, std::vector<std::vector<
         possibleMove.setFillColor(sf::Color(255, 150, 150, 100));
         window.draw(possibleMove);
     }
+}
+
+// Draw a border around the given position
+void Board::drawBorder(sf::RenderWindow &window, int x, int y, int r, int g, int b, int outlineThickness)
+{
+    sf::RectangleShape border;
+    border.setFillColor(sf::Color::Transparent);
+    border.setSize(sf::Vector2f(global::squareSize - (outlineThickness * 2), global::squareSize - (outlineThickness * 2)));
+    border.setPosition(sf::Vector2f((y * global::squareSize) + outlineThickness, (x * global::squareSize) + outlineThickness));
+    border.setOutlineThickness(outlineThickness);
+    border.setOutlineColor(sf::Color(r, g, b, 255));
+    window.draw(border);
 }

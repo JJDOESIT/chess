@@ -3,7 +3,6 @@
 #include "globalValues.h"
 
 std::vector<int> AI::calculateBestMove(Board *board,
-                                       Piece *boardCopy[8][8],
                                        ValidMoves *checkValidMoves,
                                        int depth,
                                        int maximizingColor, int alpha, int beta)
@@ -13,7 +12,7 @@ std::vector<int> AI::calculateBestMove(Board *board,
     {
         int whiteScore = 0, blackScore = 0;
         int rank;
-        rankBoard(boardCopy, maximizingColor, whiteScore, blackScore);
+        rankBoard(board->board, maximizingColor, whiteScore, blackScore);
 
         // If the maximizing color is white, calculate a hopefully positive score
         if (maximizingColor == pieceColor::WHITE)
@@ -36,18 +35,14 @@ std::vector<int> AI::calculateBestMove(Board *board,
     bool check = false;
     std::vector<std::vector<int>> checkMoves;
 
-    // Loop through the board to find the kings position
-    for (int row = 0; row < 8; row++)
+    // Check if the king is in check
+    if (maximizingColor == pieceColor::WHITE)
     {
-        for (int col = 0; col < 8; col++)
-        {
-            // If the piece is a king and its color matches the current current player
-            if (*board->board[row][col]->getPieceType() == pieceType::KING && *board->board[row][col]->getPieceColor() == maximizingColor)
-            {
-                // Check if the king is in check
-                checkValidMoves->isKingInCheck(boardCopy, row, col, maximizingColor, checkMoves, check);
-            }
-        }
+        checkValidMoves->isKingInCheck(board->board, board->positionOfWhiteKing[0], board->positionOfWhiteKing[1], maximizingColor, checkMoves, check);
+    }
+    else
+    {
+        checkValidMoves->isKingInCheck(board->board, board->positionOfBlackKing[0], board->positionOfBlackKing[1], maximizingColor, checkMoves, check);
     }
 
     // Loop through the board
@@ -56,10 +51,10 @@ std::vector<int> AI::calculateBestMove(Board *board,
         for (int col = 0; col < 8; col++)
         {
             // If the piece color equals the maximizing color
-            if (*boardCopy[row][col]->getPieceColor() == maximizingColor)
+            if (*board->board[row][col]->getPieceColor() == maximizingColor)
             {
                 // Add the move to the valid moves list
-                checkValidMoves->getValidMoves(board, boardCopy, row, col, checkMoves, check, NULL, &allPossibleMoves);
+                checkValidMoves->getValidMoves(board, board->board, row, col, checkMoves, check, NULL, &allPossibleMoves);
             }
         }
     }
@@ -78,14 +73,14 @@ std::vector<int> AI::calculateBestMove(Board *board,
         int endX = move[1][0];
         int endY = move[1][1];
 
-        int startType = *boardCopy[startX][startY]->getPieceType();
-        int endType = *boardCopy[endX][endY]->getPieceType();
+        int startType = *board->board[startX][startY]->getPieceType();
+        int endType = *board->board[endX][endY]->getPieceType();
 
-        int startColor = *boardCopy[startX][startY]->getPieceColor();
-        int endColor = *boardCopy[endX][endY]->getPieceColor();
+        int startColor = *board->board[startX][startY]->getPieceColor();
+        int endColor = *board->board[endX][endY]->getPieceColor();
 
         // Check if the possible move is a passant capture
-        bool passant = checkValidMoves->isThisMoveEnPassant(boardCopy, startX, startY, endX, endY);
+        bool passant = checkValidMoves->isThisMoveEnPassant(board->board, startX, startY, endX, endY);
 
         // Check if the possible is a castle
         bool castle = (startType == pieceType::KING && endType == pieceType::ROOK && startColor == endColor);
@@ -93,25 +88,25 @@ std::vector<int> AI::calculateBestMove(Board *board,
         bool promotion = false;
 
         // Move the piece
-        board->movePiece(boardCopy, startX, startY, endX, endY, true);
+        board->movePiece(board->board, startX, startY, endX, endY, true);
 
         // Recursive call switching to the opposite color
         if (maximizingColor == pieceColor::WHITE)
         {
-            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::BLACK, alpha, beta);
+            moveData = calculateBestMove(board, checkValidMoves, depth - 1, pieceColor::BLACK, alpha, beta);
         }
         else
         {
-            moveData = calculateBestMove(board, boardCopy, checkValidMoves, depth - 1, pieceColor::WHITE, alpha, beta);
+            moveData = calculateBestMove(board, checkValidMoves, depth - 1, pieceColor::WHITE, alpha, beta);
         }
 
-        if (startType == pieceType::PAWN && startType != *boardCopy[endX][endY]->getPieceType())
+        if (startType == pieceType::PAWN && startType != *board->board[endX][endY]->getPieceType())
         {
             promotion = true;
         }
 
         // Undo the move
-        board->undoMove(boardCopy, startX, startY, endX, endY, startType, endType, startColor, endColor, passant, castle, promotion);
+        board->undoMove(board->board, startX, startY, endX, endY, startType, endType, startColor, endColor, passant, castle, promotion);
 
         // If the current turn is white
         if (maximizingColor == pieceColor::WHITE)
