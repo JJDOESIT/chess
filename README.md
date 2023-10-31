@@ -10,7 +10,8 @@
 
 # Features
 - AI opponent
-  - Minimax algorithm with alpha-beta pruning
+  - Different opening playbooks
+  - Built on minimax algorithm, optimized with alpha-beta pruning
 - Display legal moves\
   <img src="https://github.com/JJDOESIT/chess/assets/138625553/ddde85a0-a2b6-4342-b23a-4f2d49677ab3" width="250"></img>
 - Alert when king is in check\
@@ -28,6 +29,12 @@
 
 - <b>En Passant</b>
   - The capture by a pawn of an enemy pawn on the same row and adjacent column that has just made a two-square advance
+  - Before and after example:\
+<img src="https://github.com/JJDOESIT/chess/assets/138625553/6baf0e37-73ae-464d-a40a-57b597d1f41c" width="250"></img>
+<img src="https://github.com/JJDOESIT/chess/assets/138625553/a69e2549-9f44-42f6-a073-db9de7727e67" width="250"></img>
+
+- <b>Pawn Promotion</b>
+  - The replacement of a pawn with a new piece when the pawn is moved to its farthest possible square
   - Before and after example:\
 <img src="https://github.com/JJDOESIT/chess/assets/138625553/6baf0e37-73ae-464d-a40a-57b597d1f41c" width="250"></img>
 <img src="https://github.com/JJDOESIT/chess/assets/138625553/a69e2549-9f44-42f6-a073-db9de7727e67" width="250"></img>
