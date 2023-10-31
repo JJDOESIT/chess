@@ -36,5 +36,5 @@
 - <b>Pawn Promotion</b>
   - The replacement of a pawn with a new piece when the pawn is moved to its farthest possible square
   - Before and after example:\
-<img src="https://github.com/JJDOESIT/chess/assets/138625553/6baf0e37-73ae-464d-a40a-57b597d1f41c" width="250"></img>
-<img src="https://github.com/JJDOESIT/chess/assets/138625553/a69e2549-9f44-42f6-a073-db9de7727e67" width="250"></img>
+<img src="https://github.com/JJDOESIT/chess/assets/138625553/04d9c1ab-b27e-44f2-9039-4b07d5ef0462" width="250"></img>
+<img src="https://github.com/JJDOESIT/chess/assets/138625553/6f19861e-54ea-4a9b-95e2-acfb0b99646f" width="250"></img>
