@@ -35,13 +35,4 @@ namespace playerMode
     };
 }
 
-namespace playerTurn
-{
-    enum playerTurn
-    {
-        WHITE,
-        BLACK
-    };
-}
-
 #endif

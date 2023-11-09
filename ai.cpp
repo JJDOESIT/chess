@@ -54,7 +54,7 @@ std::vector<int> AI::calculateBestMove(Board *board,
             if (*board->board[row][col]->getPieceColor() == maximizingColor)
             {
                 // Add the move to the valid moves list
-                checkValidMoves->getValidMoves(board, board->board, row, col, checkMoves, check, NULL, &allPossibleMoves);
+                checkValidMoves->getValidMoves(board, row, col, checkMoves, check, NULL, &allPossibleMoves);
             }
         }
     }

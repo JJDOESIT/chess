@@ -3,6 +3,7 @@
 #include "validMoves.h"
 #include "board.h"
 #include "ai.h"
+#include "globalValues.h"
 
 #include <vector>
 #include <iostream>
@@ -18,7 +19,7 @@ int main()
     board.initilizeBoard();
     std::vector<std::vector<int>> moves;
 
-    sf::RenderWindow window(sf::VideoMode(544, 544), "Chess");
+    sf::RenderWindow window(sf::VideoMode(global::windowSize, global::windowSize), "Chess");
 
     while (window.isOpen())
     {
@@ -32,6 +33,11 @@ int main()
         board.drawSprites(window);
 
         board.drawPossibleMoves(window, &moves);
+
+        if (*board.getCheckmate())
+        {
+            board.drawText(window, "Checkmate", (global::windowSize / 2) - 125, (global::windowSize / 2) - 70);
+        }
 
         window.display();
     }

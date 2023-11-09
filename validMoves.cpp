@@ -8,36 +8,36 @@ bool ValidMoves::checkBoundary(int x, int y)
 
 // Get valid moves
 void ValidMoves::getValidMoves(Board *board,
-                               Piece *boardPtr[8][8], int x, int y,
+                               int x, int y,
                                std::vector<std::vector<int>> &checkMoves,
                                bool &isInCheck,
                                std::vector<std::vector<int>> *moves,
                                std::vector<std::vector<std::vector<int>>> *allPossibleMoves)
 {
-    int type = *boardPtr[x][y]->getPieceType();
-    int color = *boardPtr[x][y]->getPieceColor();
-    boardPtr[x][y]->getValidMoves()->clear();
+    int type = *board->board[x][y]->getPieceType();
+    int color = *board->board[x][y]->getPieceColor();
+    board->board[x][y]->getValidMoves()->clear();
 
     switch (type)
     {
     case (pieceType::ROOK):
-        getRook(board, boardPtr, x, y);
+        getRook(board, board->board, x, y);
         break;
     case (pieceType::PAWN):
-        getPawn(board, boardPtr, x, y);
+        getPawn(board, board->board, x, y);
         break;
     case (pieceType::KING):
-        getKing(boardPtr, x, y);
-        checkCastle(board, boardPtr, x, y);
+        getKing(board->board, x, y);
+        checkCastle(board, board->board, x, y);
         break;
     case (pieceType::QUEEN):
-        getQueen(board, boardPtr, x, y);
+        getQueen(board, board->board, x, y);
         break;
     case (pieceType::BISHOP):
-        getBishop(board, boardPtr, x, y);
+        getBishop(board, board->board, x, y);
         break;
     case (pieceType::KNIGHT):
-        getKnight(board, boardPtr, x, y);
+        getKnight(board, board->board, x, y);
         break;
     }
 
@@ -48,26 +48,26 @@ void ValidMoves::getValidMoves(Board *board,
     if (isInCheck)
     {
         // Create a copy of the pieces valid moves list
-        std::vector<std::vector<int>> validMoves = *boardPtr[x][y]->getValidMoves();
+        std::vector<std::vector<int>> validMoves = *board->board[x][y]->getValidMoves();
 
         // If the selected piece is a king
-        if (*boardPtr[x][y]->getPieceType() == pieceType::KING)
+        if (*board->board[x][y]->getPieceType() == pieceType::KING)
         {
-            getKing(boardPtr, x, y);
+            getKing(board->board, x, y);
         }
         else
         {
-            compareTwoMovesLists(boardPtr, x, y, validMoves, checkMoves);
+            compareTwoMovesLists(board->board, x, y, validMoves, checkMoves);
         }
     }
 
-    detectPinnedPieces(boardPtr, color, x, y);
+    detectPinnedPieces(board->board, color, x, y);
 
     // If the move list is not passed in as an argument, dont add piece moves to move list
     if (moves != NULL)
     {
         // Set the drawable moves to the pieces valid moves
-        *moves = *boardPtr[x][y]->getValidMoves();
+        *moves = *board->board[x][y]->getValidMoves();
         if (moves->size() > 0)
         {
             board->mode = playerMode::VIEW;
@@ -77,7 +77,7 @@ void ValidMoves::getValidMoves(Board *board,
     // If allPossibleMoves is passed as a parameter, populate it with the exisitng values in valid moves
     if (allPossibleMoves != NULL)
     {
-        std::vector<std::vector<int>> validMovesPtr = *boardPtr[x][y]->getValidMoves();
+        std::vector<std::vector<int>> validMovesPtr = *board->board[x][y]->getValidMoves();
         for (auto move : validMovesPtr)
         {
             allPossibleMoves->push_back(std::vector<std::vector<int>>{{x, y}, {move[0], move[1]}});
@@ -111,6 +111,27 @@ void ValidMoves::compareTwoMovesLists(Piece *boardPtr[8][8], int x, int y, std::
             }
         }
     }
+}
+
+// Detect checkmate
+bool ValidMoves::detectCheckMate(Board *board, std::vector<std::vector<int>> &checkMoves, bool check)
+{
+    for (int row = 0; row < 8; row++)
+    {
+        for (int col = 0; col < 8; col++)
+        {
+            if (*board->board[row][col]->getPieceColor() == *board->getCurrentTurn())
+            {
+                getValidMoves(board, row, col, checkMoves, check);
+                std::vector<std::vector<int>> *validMovesPtr = board->board[row][col]->getValidMoves();
+                if (validMovesPtr->size() > 0)
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }
 
 // Get possible moves for pawn
@@ -181,7 +202,7 @@ void ValidMoves::getPawn(Board *board, Piece *boardPtr[8][8], int x, int y)
     std::vector<int> *lastMovedPiecePtr;
 
     // Fetch the position of the last moved piece depending on whose turn it is
-    if (*board->getCurrentTurn() == playerTurn::WHITE)
+    if (*board->getCurrentTurn() == pieceColor::WHITE)
     {
         lastMovedPiecePtr = board->getpositionOfLastMovedBlackPiece();
     }
@@ -575,6 +596,7 @@ void ValidMoves::detectCheckFromLinearPieces(Piece *board[8][8], std::vector<std
     }
 }
 
+// Detect check from singular moving pieces
 void ValidMoves::detectCheckFromSingularPieces(Piece *boardPtr[8][8], std::vector<std::vector<int>> possibleMoves, int kingX, int kingY, int kingColor, int type, std::vector<std::vector<int>> &checkMoves)
 {
     for (std::vector<int> move : possibleMoves)

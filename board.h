@@ -10,8 +10,6 @@
 class Board
 {
 private:
-    Piece *board[8][8] = {nullptr};
-
     std::vector<Piece> pieceList;
     std::vector<Piece> overwriteList;
     std::vector<sf::Texture> textureList;
@@ -37,7 +35,7 @@ private:
 
     int swapBuffer[2];
 
-    int turn = playerTurn::WHITE;
+    int turn = pieceColor::WHITE;
 
     int mode = playerMode::NONE;
 
@@ -53,7 +51,10 @@ private:
     bool isPlayerInCheck = false;
     std::vector<std::vector<int>> displayCheckList;
 
+    bool checkmate = false;
+
 public:
+    Piece *board[8][8] = {nullptr};
     void initilizeBoard();
     void overwritePiece(int type, int color, int x, int y);
     void swapPieces(Piece *boardPtr[8][8], int x1, int y1, int x2, int y2);
@@ -76,6 +77,9 @@ public:
 
     int *getCurrentTurn();
     void switchTurn();
+
+    void setCheckmate(bool isCheckmate);
+    bool *getCheckmate();
 
     void checkForPassant(Piece *boardPtr[8][8], int x, int y, bool simulate = false);
 
@@ -103,6 +107,7 @@ public:
     void drawBoard(sf::RenderWindow &window);
     void drawPossibleMoves(sf::RenderWindow &window, std::vector<std::vector<int>> *moves);
     void drawBorder(sf::RenderWindow &window, int x, int y, int r, int g, int b, int outlineThickness);
+    void drawText(sf::RenderWindow &window, std::string text, int x, int y);
 
     friend class Input;
     friend class ValidMoves;

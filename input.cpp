@@ -36,7 +36,7 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
     }
 
     // If the current turn is white (AI)
-    if (*board->getCurrentTurn() == playerTurn::WHITE)
+    if (*board->getCurrentTurn() == pieceColor::WHITE)
     {
         // If the no pieces are in the process of moving
         if (!board->isPieceMoving)
@@ -61,6 +61,9 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
         // Check if the move resulted in check
         isKingInCheck(board, checkValidMoves);
         addCheckPositions(board);
+
+        // Check if the move resulted in checkmate
+        board->setCheckmate(checkValidMoves->detectCheckMate(board, checkMoves, check));
     }
 }
 
@@ -91,7 +94,7 @@ void Input::getPossibleMoves(sf::RenderWindow &window, Board *board,
     {
         if (type != pieceType::NONE)
         {
-            checkValidMoves->getValidMoves(board, board->board, x, y, checkMoves, check, moves, NULL);
+            checkValidMoves->getValidMoves(board, x, y, checkMoves, check, moves);
         }
     }
 }
@@ -146,7 +149,7 @@ void Input::cleanUpOpening(std::vector<int> matrixData)
 void Input::isKingInCheck(Board *board, ValidMoves *checkValidMoves)
 {
     // Check if the king is in check
-    if (*board->getCurrentTurn() == playerTurn::WHITE)
+    if (*board->getCurrentTurn() == pieceColor::WHITE)
     {
         checkValidMoves->isKingInCheck(board->board, board->positionOfWhiteKing[0], board->positionOfWhiteKing[1], *board->getCurrentTurn(), checkMoves, check);
     }

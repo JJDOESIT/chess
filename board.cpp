@@ -161,7 +161,26 @@ int *Board::getCurrentTurn()
 // Switch current turn
 void Board::switchTurn()
 {
-    turn = !turn;
+    if (turn == pieceColor::WHITE)
+    {
+        turn = pieceColor::BLACK;
+    }
+    else
+    {
+        turn = pieceColor::WHITE;
+    }
+}
+
+// Set checkmate flag
+void Board::setCheckmate(bool isCheckmate)
+{
+    checkmate = isCheckmate;
+}
+
+// Return a pointer to whether the game is over or not
+bool *Board::getCheckmate()
+{
+    return &checkmate;
 }
 
 // Check to see if the move being taken is a passant take
@@ -309,7 +328,7 @@ void Board::castle(Piece *boardPtr[8][8], int attackingX, int attackingY, int de
 
     if (!simulate)
     {
-        if (turn == playerTurn::WHITE)
+        if (turn == pieceColor::WHITE)
         {
             hasWhiteCastled = true;
         }
@@ -385,7 +404,7 @@ void Board::movePiece(Piece *boardPtr[8][8], int attackingX, int attackingY, int
     // Set the position of the last moved piece to its corresponding color
     if (!simulate)
     {
-        if (*getCurrentTurn() == playerTurn::WHITE)
+        if (*getCurrentTurn() == pieceColor::WHITE)
         {
             totalWhiteMoveCount += 1;
             setPositionOfLastMovedWhitePiece(defendingX, defendingY);
@@ -556,7 +575,7 @@ void Board::drawSprites(sf::RenderWindow &window)
             {
                 drawBorder(window, move[0], move[1], 255, 0, 0, outlineThickness);
 
-                if (*getCurrentTurn() == playerTurn::WHITE)
+                if (*getCurrentTurn() == pieceColor::WHITE)
                 {
                     drawBorder(window, positionOfWhiteKing[0], positionOfWhiteKing[1], 255, 0, 0, outlineThickness);
                 }
@@ -616,4 +635,18 @@ void Board::drawBorder(sf::RenderWindow &window, int x, int y, int r, int g, int
     border.setOutlineThickness(outlineThickness);
     border.setOutlineColor(sf::Color(r, g, b, 255));
     window.draw(border);
+}
+
+// Draw Text
+void Board::drawText(sf::RenderWindow &window, std::string text, int x, int y)
+{
+    sf::Font font;
+    font.loadFromFile("./fonts/Godsome.ttf");
+    sf::Text textObject;
+    textObject.setFont(font);
+    textObject.setCharacterSize(50);
+    textObject.setString(text);
+    textObject.setPosition(sf::Vector2f(x, y));
+    textObject.setFillColor(sf::Color::Black);
+    window.draw(textObject);
 }

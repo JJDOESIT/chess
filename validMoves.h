@@ -11,7 +11,6 @@ class ValidMoves
 public:
     bool checkBoundary(int x, int y);
     void getValidMoves(Board *board,
-                       Piece *boardPtr[8][8],
                        int x,
                        int y,
                        std::vector<std::vector<int>> &checkMoves,
@@ -20,6 +19,8 @@ public:
                        std::vector<std::vector<std::vector<int>>> *allPossibleMoves = NULL);
 
     void compareTwoMovesLists(Piece *boardPtr[8][8], int x, int y, std::vector<std::vector<int>> moveListOne, std::vector<std::vector<int>> moveListTwo);
+
+    bool detectCheckMate(Board *board, std::vector<std::vector<int>> &checkMoves, bool check);
 
     void getPawn(Board *board, Piece *boardPtr[8][8], int x, int y);
     void getRook(Board *board, Piece *boardPtr[8][8], int x, int y);

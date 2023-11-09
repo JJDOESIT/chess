@@ -14,7 +14,7 @@ private:
     bool isOpening = true;
     int openingSet;
 
-    bool check;
+    bool check = false;
     std::vector<std::vector<int>> checkMoves;
 
 public:

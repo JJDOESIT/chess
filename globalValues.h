@@ -3,6 +3,9 @@
 
 namespace global
 {
+
+    inline int windowSize = 544;
+
     inline int depth = 2;
 
     inline int squareSize = 68;
