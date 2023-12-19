@@ -1,6 +1,6 @@
 # Mailbox Chess Engine
 
-<b>Requirements:</b> SFML and Build Essential
+<b>Requirements:</b> Linux, SFML and Build Essential
 <br>
 <br>
 <b>Quick install:</b>
@@ -10,8 +10,7 @@
 
 <b>How to use:</b>
 - Run the makefile in command shell or IDE terminal
-  - If on Windows, install GNU Make through chocolatey
-    - ```choco install make```
+  - <b>Note:</b> Neccesary changes to install location of SFML might be required in the makefile
 
 # Features
 - AI opponent
