@@ -1,16 +1,24 @@
 # Mailbox Chess Engine
 
-<b>Requirements:</b> Linux, SFML and Build Essential
+<b>Requirements:</b> Linux Environment
 <br>
 <br>
-<b>Quick install:</b>
+<b>Quick Install:</b>
 <br>
-- ```sudo apt-get install libsfml-dev```
-- ```sudo apt-get install build-essential```
+1. Download latest release zip for Linux
+2. Move the downloaded zip into a Linux environment
+3. Extract the files
+4. Run chess.exe
+    * If permissions denied, run ```chmod 700 <path to chess.exe>``` and try running again
 
-<b>How to use:</b>
-- Run the makefile in command shell or IDE terminal
-  - <b>Note:</b> Neccesary changes to install location of SFML might be required in the makefile
+
+
+<b>Build Yourself:</b>
+<br>
+1. Clone the repo or download the source code in a Linux environment
+2.  Install the requirements: ```sudo apt-get install libsfml-dev``` and ```sudo apt-get install build-essential```
+3. Run the makefile in command shell or IDE terminal
+    - Note: Neccesary changes to install location of SFML might be required in the makefile
 
 # Features
 - AI opponent
