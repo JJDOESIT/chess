@@ -1,11 +1,10 @@
 COMPILE=g++ -c *.cpp
-LINK=g++ *.o -o sfml-app -lsfml-graphics -lsfml-window -lsfml-system
-EXECUTE=./sfml-app
+LINK=g++ *.o -o chess.exe -lsfml-graphics -lsfml-window -lsfml-system
+EXECUTE=./chess.exe
 define REMOVE
 rm main.o
 rm board.o
 rm piece.o
-rm sfml-app
 rm validMoves.o
 rm input.o
 rm ai.o

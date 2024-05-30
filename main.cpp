@@ -19,7 +19,7 @@ int main()
     board.initilizeBoard();
     std::vector<std::vector<int>> moves;
 
-    sf::RenderWindow window(sf::VideoMode(global::windowSize, global::windowSize), "Chess");
+    sf::RenderWindow window(sf::VideoMode(global::windowSize, global::windowSize), "Chess", sf::Style::Titlebar | sf::Style::Close);
 
     while (window.isOpen())
     {

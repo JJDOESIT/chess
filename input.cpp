@@ -12,6 +12,9 @@ void Input::whileOpen(sf::RenderWindow &window, sf::Event &events, Board *board,
         if (events.type == sf::Event::Closed)
             window.close();
 
+        if (events.type == sf::Event::Resized)
+            window.setSize(sf::Vector2u(global::windowSize, global::windowSize));
+
         // If the mouse button is clicked
         if (events.type == sf::Event::MouseButtonReleased)
         {
