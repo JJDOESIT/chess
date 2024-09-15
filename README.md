@@ -5,8 +5,7 @@
 <br>
 <b>Quick Install:</b>
 <br>
-1. Download latest <a href="https://github.com/JJDOESIT/chess/releases/tag/v1.0.0">chess.zip</a> release for Linux
-2. Move the downloaded zip into a Linux environment
+1. Download latest <a href="https://github.com/JJDOESIT/chess/releases/tag/v1.0.0">chess.zip</a> release for Windows or Linux
 3. Extract the files
 4. Run chess.exe
     * If permissions denied, run ```chmod 700 <path to chess.exe>``` and try running again
