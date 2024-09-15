@@ -1,7 +1,4 @@
 # Mailbox Chess Engine
-
-<b>Requirements:</b> Linux Environment
-<br>
 <br>
 <b>Quick Install:</b>
 <br>
