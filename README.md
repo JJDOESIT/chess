@@ -50,5 +50,5 @@
 <img src="https://github.com/JJDOESIT/chess/assets/138625553/04d9c1ab-b27e-44f2-9039-4b07d5ef0462" width="250"></img>
 <img src="https://github.com/JJDOESIT/chess/assets/138625553/6f19861e-54ea-4a9b-95e2-acfb0b99646f" width="250"></img>
 
-# <a href="https://www.youtube.com/watch?v=TpB3E4_cgZ0">Video</a>
+# <b><a href="https://www.youtube.com/watch?v=TpB3E4_cgZ0">Video</a></b>
 <a href="https://www.youtube.com/watch?v=TpB3E4_cgZ0"><img src="https://img.youtube.com/vi/TpB3E4_cgZ0/maxresdefault.jpg" alt="Chess" width="600" ></a>
